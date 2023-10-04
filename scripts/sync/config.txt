@@ -1,0 +1,51 @@
+# derpy's script server: official sync demo - derpy54320
+
+[DEBUG]
+#dbg_leader derpy54320
+#dbg_nojimmy true
+
+[OTHER SHIT I JUST ADDED TO THIS SERVER]
+add_player_blips false
+reset_ped_interval 60
+
+[PREFERENCES]
+min_slide_duration 100
+max_slide_duration 500
+
+[LIMITATIONS]
+# If there are over 20 peds when a ped is created (not including the newly created ped), a single ambient ped will be deleted instantly.
+soft_ped_limit 21 # sync peds are only spawned when there are less peds than this
+hard_ped_limit 24 # delete sync peds when there are more peds than this
+
+[REQUIREMENTS]
+require_version 7
+require_dependency loadanim
+
+[SERVER SCRIPTS]
+main_script api.lua
+main_script models.lua
+main_script sv_players.lua
+main_script sv_peds.lua
+main_script sv_vehicles.lua
+main_script sv_world.lua
+main_script sv_debug.lua
+
+[CLIENT SCRIPTS]
+client_script api.lua
+client_script models.lur
+client_script cl_players.lua
+client_script cl_peds.lua
+client_script cl_vehicles.lua
+client_script cl_world.lua
+client_script cl_update.lua
+
+[CLIENT DEBUG]
+#client_script cl_debug.lua
+#client_script cl_nodetest.lua
+
+[fuck it]
+#main_script sv_mission.lua
+#client_script cl_mission.lua
+
+[CLIENT FILES]
+client_file actions.lur

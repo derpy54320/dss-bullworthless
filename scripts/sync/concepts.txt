@@ -1,0 +1,15 @@
+LEADER BASED SYNC - derpy54320
+
+LEADER PLAYER:
+only one player is chosen as the leader, and the server will listen to this player for the main updates about game state.
+the leader can only change when there is not a leader, or the current leader leaves. this is important for how some scripts are designed to handle update counting.
+
+UPDATE COUNTS:
+server scripts are meant to have the most important say in the state of the server (duh). so for certain networked things, there are server update counts.
+when something on the server is "updating" it means that the server will not listen to what a player has to say about that bit of state until the player has acknowledged all updates.
+when something changes from a server sync api function (the global "sync" table for other scripts), the update count goes up. when a player gets these updates, they tell the server to lower it.
+this is tracked per player, unless it only deals with the leader player and cannot switch owners.
+
+ENTITY OWNERS:
+some things are only controlled by the leader (like the weather for example), but some entities (like peds) can have different owners.
+this is important because some things need to be controlled by other players (like a player's ped for example, but also the vehicle they may be driving).
