@@ -868,7 +868,7 @@ CreateThread(function()
 		return
 	end
 	while true do
-		Wait(interval)
+		Wait(interval*1000)
 		F_ResetPeds()
 	end
 end)
