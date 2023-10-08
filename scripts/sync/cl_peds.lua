@@ -20,7 +20,6 @@ gSoftLimit = GetConfigNumber(GetScriptConfig(),"soft_ped_limit",gHardLimit)
 gMinTrans = GetConfigNumber(GetScriptConfig(),"min_slide_duration",0)
 gMaxTrans = GetConfigNumber(GetScriptConfig(),"max_slide_duration",0)
 gAddBlips = GetConfigBoolean(GetScriptConfig(),"add_player_blips",false)
-gResetRate = GetConfigNumber(GetScriptConfig(),"reset_ped_interval",0)
 
 -- actions:
 gTreeWhitelist = {
@@ -852,10 +851,10 @@ function F_Different(a,b)
 	return false
 end
 
--- reset peds (patch for peds disappearing):
-function F_ResetPeds()
+-- reset peds:
+function F_ResetPeds() -- needed occasionally because of a bug that hasn't been figured out yet
 	for _,ped in pairs(gPeds) do
-		if ped.ped ~= gPlayer then
+		if not ped.owned and ped.ped ~= gPlayer then
 			if PedIsValid(ped.ped) then
 				PedDelete(ped.ped)
 			end
@@ -864,11 +863,12 @@ function F_ResetPeds()
 	end
 end
 CreateThread(function()
-	if gResetRate <= 0 then
+	local interval = GetConfigNumber(GetScriptConfig(),"ped_reset_interval",0)
+	if interval <= 0 then
 		return
 	end
 	while true do
-		Wait(gResetRate * 1000)
+		Wait(interval)
 		F_ResetPeds()
 	end
 end)
