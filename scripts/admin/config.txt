@@ -1,0 +1,15 @@
+# derpy's script server: admin utilities - derpy54320
+
+# also see admin.txt for more config
+
+[INTEGRATIONS]
+use_account_system false		# use "account" scripts for verification and to show usernames in /players
+
+[LOGGING]
+log_actions true		# show all admin / moderator actions in server
+
+[CONFIG]
+require_version 7
+require_name admin
+main_script sv_admin.lua
+client_script cl_admin.lua

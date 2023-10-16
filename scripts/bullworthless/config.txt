@@ -1,0 +1,3 @@
+main_script sv_bullworthless.lua
+client_script cl_bullworthless.lua
+client_file models.lua
