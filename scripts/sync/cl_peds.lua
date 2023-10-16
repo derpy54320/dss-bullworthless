@@ -425,9 +425,9 @@ function T_Convert()
 	while true do
 		if s.leader then
 			F_ConvertPeds()
-			F_DebugConvert(" UNCONVERTED PEDS")
+			--F_DebugConvert(" UNCONVERTED PEDS")
 		else
-			F_DebugConvert(" UNWANTED PEDS")
+			--F_DebugConvert(" UNWANTED PEDS")
 		end
 		Wait(0)
 	end
