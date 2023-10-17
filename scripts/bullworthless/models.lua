@@ -1,5 +1,5 @@
 PED_MODELS = {
-	[0] = "player",--[[1] = "DEFAULTPED",]][2] = "DOgirl_Zoe_EG",[3] = "NDGirl_Beatrice",[4] = "NDH1a_Algernon",
+	--[[0] = "player",[1] = "DEFAULTPED",]][2] = "DOgirl_Zoe_EG",[3] = "NDGirl_Beatrice",[4] = "NDH1a_Algernon",
 	[5] = "NDH1_Fatty",[6] = "ND2nd_Melvin",[7] = "NDH2_Thad",[8] = "NDH3_Bucky",[9] = "NDH2a_Cornelius",
 	[10] = "NDLead_Earnest",[11] = "NDH3a_Donald",[12] = "JKH1_Damon",[13] = "JKH1a_Kirby",[14] = "JKGirl_Mandy",
 	[15] = "JKH2_Dan",[16] = "JKH2a_Luis",[17] = "JKH3_Casey",[18] = "JKH3a_Bo",[19] = "JKlead_Ted",

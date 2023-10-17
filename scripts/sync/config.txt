@@ -2,7 +2,7 @@
 
 [DEBUG]
 #dbg_leader derpy54320
-#dbg_nojimmy true
+dbg_nojimmy true
 
 [PREFERENCES]
 min_slide_duration 100
