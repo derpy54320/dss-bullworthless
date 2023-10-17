@@ -69,7 +69,7 @@ function CB_PlayerDropped(player)
 	local data = gPlayers[player]
 	if data then -- make sure the player was actually joined before showing the leave message
 		gPlayers[player] = nil
-		F_NotifyLeft(player)
+		F_NotifyLeft(player,data.name)
 	end
 end
 
@@ -83,7 +83,7 @@ function CB_PlayerSignedOut(player)
 	local data = gPlayers[player]
 	if data then
 		gPlayers[player] = nil
-		F_NotifyLeft(player)
+		F_NotifyLeft(player,data.name)
 	end
 end
 function CB_AccountScriptStopping()
@@ -102,20 +102,21 @@ end
 
 -- server messages
 function F_NotifyJoined(player)
+	local name = gPlayers[player].name
 	for p,d in pairs(gPlayers) do
 		if d.moderator then
-			SendNetworkEvent(p,"chat:playerJoined",gPlayers[player].name,player)
+			SendNetworkEvent(p,"chat:playerJoined","["..player.."] "..name)
 		else
-			SendNetworkEvent(p,"chat:playerJoined",gPlayers[player].name)
+			SendNetworkEvent(p,"chat:playerJoined",name)
 		end
 	end
 end
-function F_NotifyLeft(player)
+function F_NotifyLeft(player,name)
 	for p,d in pairs(gPlayers) do
 		if d.moderator then
-			SendNetworkEvent(p,"chat:playerLeft",data.name,player)
+			SendNetworkEvent(p,"chat:playerLeft","["..player.."] "..name)
 		else
-			SendNetworkEvent(p,"chat:playerLeft",data.name)
+			SendNetworkEvent(p,"chat:playerLeft",name)
 		end
 	end
 end

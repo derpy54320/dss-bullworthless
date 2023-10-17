@@ -392,20 +392,12 @@ RegisterLocalEventHandler("ControllersUpdated",function()
 end)
 
 -- network events
-RegisterNetworkEventHandler("chat:playerJoined",function(name,id)
-	if id then
-		F_AddNotification("output","["..id.."] "..name.." has joined the game.")
-	else
-		F_AddNotification("output",name.." has joined the game.")
-	end
+RegisterNetworkEventHandler("chat:playerJoined",function(name)
+	F_AddNotification("output",name.." has joined the game.")
 	SoundPlay2D("RightBtn")
 end)
-RegisterNetworkEventHandler("chat:playerLeft",function(name,id)
-	if id then
-		F_AddNotification("output","["..id.."] "..name.." has left the game.")
-	else
-		F_AddNotification("output",name.." has left the game.")
-	end
+RegisterNetworkEventHandler("chat:playerLeft",function(name)
+	F_AddNotification("output",name.." has left the game.")
 	SoundPlay2D("WrongBtn")
 end)
 RegisterNetworkEventHandler("chat:playerMessage",function(name,str,r,g,b)
