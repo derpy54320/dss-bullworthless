@@ -91,6 +91,7 @@ function is_spawn_occupied(x1,y1,z1,range)
 end
 
 CreateThread(function()
+	Wait(1000) -- TODO: get rid of this for better timing with basync starting
 	while true do
 		local count = 0
 		for ped in net.basync.all_peds() do
