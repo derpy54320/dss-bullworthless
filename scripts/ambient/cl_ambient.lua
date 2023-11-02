@@ -35,7 +35,7 @@ function main()
 	SendNetworkEvent("ambient:initPlayer")
 	while true do
 		if can_make_spawns() then
-			local x,y,z = PedFindRandomSpawnPosition()
+			local x,y,z = PedFindRandomSpawnPosition(gPlayer)
 			if x ~= 9999 and not is_spawn_occupied(x,y,z,1) then
 				local index = 1
 				local timer = GetTimer()
@@ -65,12 +65,12 @@ function main()
 				if PedIsValid(v) then
 					if ped:is_owner() then
 						if not wandering[ped] then
-							PedWander(ped)
+							PedWander(v)
 							wandering[ped] = true
 						end
 					elseif wandering[ped] then
-						PedStop(ped)
-						PedClearObjectives(ped)
+						PedStop(v)
+						PedClearObjectives(v)
 						wandering[ped] = nil
 					end
 				end
