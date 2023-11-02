@@ -15,6 +15,7 @@ RegisterNetworkEventHandler("ambient:setPeds",function(ids)
 			PrintWarning("ambient:setPeds failed to get ped #"..id)
 		end
 	end
+	print("...")
 end)
 RegisterNetworkEventHandler("ambient:addPed",function(id)
 	local ped = net.basync.get_ped_from_server(id,true)
@@ -23,6 +24,7 @@ RegisterNetworkEventHandler("ambient:addPed",function(id)
 	else
 		PrintWarning("ambient:addPed failed to get ped #"..id)
 	end
+	print("!")
 end)
 
 -- main
@@ -49,6 +51,7 @@ function main()
 				if index < SPAWN_BURST then
 					SendNetworkEvent("ambient:spawnPed",AreaGetVisible(),x,y,z)
 					times[index] = timer + SPAWN_TIMER
+					print("?")
 				end
 			end
 		end
