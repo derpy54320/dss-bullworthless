@@ -38,7 +38,7 @@ function main()
 			local x,y,z = PedFindRandomSpawnPosition(gPlayer)
 			if x ~= 9999 and not is_spawn_occupied(x,y,z,1) then
 				local timer = GetTimer()
-				while timer >= times[1] do
+				while times[1] and timer >= times[1] do
 					table.remove(times,1)
 				end
 				if table.getn(times) <= SPAWN_BURST then
