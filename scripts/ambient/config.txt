@@ -1,0 +1,4 @@
+require_verson 8
+require_dependency basync
+main_script sv_ambient.lua
+client_script cl_ambient.lua

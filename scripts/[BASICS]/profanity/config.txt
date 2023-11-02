@@ -1,0 +1,54 @@
+# derpy's script server: profanity filter - derpy54320
+
+# other scripts can use the api in profanity.lua to check or clean strings
+# profanity is put into 3 levels where 3 is the most "offensive"
+
+# profanity is filtered by only checking the sequence of letters in a string
+# for this reason you should not use spaces when specifying profane words
+
+[PREFERENCES]
+default_level 3			# the lowest profanity level to filter out by default (when 0 is used by other scripts)
+harsh_filter false		# replace an entire string with * if it contains something bad
+
+[CLEAN_WORDS]
+#clean_word nigh		# if a profane word ends up being a clean word then it doesn't count
+
+[PROFANITY_3]	# slurs or trauma inducing
+profanity3 beaner
+profanity3 chink
+profanity3 dyke
+profanity3 fag
+profanity3 kike
+profanity3 killurself
+profanity3 killyourself
+profanity3 nigg
+profanity3 rape
+profanity3 rapist
+profanity3 retard
+profanity3 spearchucker
+profanity3 tranny
+profanity3 trany
+profanity3 wetback
+
+[PROFANITY_2]	# harsh swear words
+profanity2 cunt
+profanity2 fuck
+profanity2 shit
+profanity2 whore
+
+[PROFANITY_1]	# mild swears
+profanity1 clit
+profanity1 cock
+profanity1 cum
+profanity1 dick
+profanity1 penis
+profanity1 pussy
+profanity1 slut
+profanity1 tits
+profanity1 titt
+
+[CONFIG]
+require_version 8
+require_name profanity
+main_script profanity.lua
+client_script profanity.lua

@@ -1,0 +1,6 @@
+# derpy's script server: loadact - derpy54320
+
+[CONFIG]
+require_version 6
+require_name loadact
+client_script loadact.lua

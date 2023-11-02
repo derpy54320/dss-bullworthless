@@ -1,6 +1,0 @@
-# derpy's script server: loadanim - derpy54320
-
-[CONFIG]
-require_version 7
-require_name loadanim
-client_script loadanim.lua

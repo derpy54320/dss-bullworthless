@@ -1,0 +1,30 @@
+# derpy's script server: chat - derpy54320 & SWEGTA
+
+[FONT]
+font_family Arial		# must be a font installed on the system
+font_weight black		# can be "normal", "bold", or "black"
+font_offset -0.1		# may need adjusting for some fonts
+font_scale 0.7
+
+[LIMITS]
+max_message_count 100		# max amount of messages to keep in chat history
+max_message_length 300		# max length for a single chat message
+
+[INTEGRATIONS]
+use_account_system false		# use "account" scripts for player names and ui timing
+use_admin_system true			# use "admin" scripts to show player ID numbers to moderators
+use_profanity_filter 0			# uncomment to use "profanity" scripts to filter chat messages (value is a profanity level)
+
+[MISCELLANEOUS]
+should_fade_chat true		# fade the chat during loading screens and respect the player's brightness settings
+log_chat_messages true		# show chat messages sent by players in the server
+display_timeout_ms 7000		# how long it takes for the chat to disappear
+help_command_output "Use /help in the console for a full list of commands. Any console command can be used here, but some may not output here."
+
+[CONFIG]
+require_version 8
+require_name chat
+main_script sv_chat.lua
+client_script cl_chat.lua
+client_file chatbox.png
+client_file chatbanner.png

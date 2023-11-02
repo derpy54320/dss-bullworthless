@@ -1,0 +1,19 @@
+# derpy's script server: server menu - derpy54320
+
+# the order of options in the main menu is determined by menu_order
+# any options not in menu_order are sorted alphabetically
+
+[PREFERENCES]
+menu_name Server Menu
+menu_style default
+menu_key F2
+
+[ORDERING]
+#menu_order Option Name 1
+#menu_order Option Name 2
+
+[CONFIG]
+require_version 8
+require_name menu
+client_script cl_menu.lua
+client_file dms.lua

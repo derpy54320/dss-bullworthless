@@ -1,0 +1,46 @@
+# derpy's script server: basic sync - derpy54320
+
+[REQUIREMENTS]
+require_version 8
+require_name basync
+
+[FEATURES]
+allow_debug true			# allow admins to use the basync debug menu
+force_player_ai true		# give the player ped player ai (disable this if you have another script that should control ai)
+allow_passengers false		# use experimental passenger support (can cause issues on the client)
+
+[PREFERENCES]
+slide_time_ms 150
+ped_pool_target 21			# if there are over 20 peds when a ped is created (not including the newly created ped), a single ambient ped will be deleted instantly
+ped_spawn_distance 50
+ped_despawn_distance 60
+vehicle_pool_target 10		# the normal limit is 15
+vehicle_spawn_distance 50
+vehicle_despawn_distance 60
+
+[SYNC_MODULES]
+client_file modules/ped_actions.lua		# all client_files starting with "modules/" are loaded as sync modules
+client_file modules/ped_flags.lua
+client_file modules/ped_stats.lua
+client_file modules/ped_target.lua
+client_file modules/ped_throttle.lua
+
+[SYNC_SCRIPTS]
+main_script sv_sync.lua			# "main" sync scripts
+client_script cl_sync.lua
+main_script sv_world.lua		# world sync
+client_script cl_world.lua
+main_script sv_peds.lua			# ped sync
+client_script cl_peds.lua
+main_script sv_vehicles.lua		# vehicle sync
+client_script cl_vehicles.lua
+
+[DEBUG_SCRIPTS]
+client_script cl_debug.lua		# debug menu for admins
+
+[UTILITY_SCRIPTS]
+client_file utility/debug.lua
+client_file utility/models.lua
+client_file utility/modules.lua
+client_file utility/nodes.lur
+client_file utility/state.lua
