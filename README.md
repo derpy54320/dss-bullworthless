@@ -30,4 +30,5 @@ If you're not familiar with github, the basic idea is that you *fork* the server
 You can use [GitHub Desktop](https://desktop.github.com/) to work on your fork.
 
 ## Resources
-See the [server manual](http://bullyscripting.net/server.html) and 
+See the [server manual](http://bullyscripting.net/server.html) and reference page for [basync](http://bullyscripting.net/basync.html).
+Also visit [bullyscripting.net](http://bullyscripting.net) for help with DSL / DSS in general.
