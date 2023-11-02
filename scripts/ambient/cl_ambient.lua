@@ -32,6 +32,7 @@ function main()
 	while not SystemIsReady() do
 		Wait(0)
 	end
+	Wait(2000) -- TODO: this shouldn't be needed, it's just a bandaid for the server sending ids before basync initialized the player
 	SendNetworkEvent("ambient:initPlayer")
 	while true do
 		if can_make_spawns() then
