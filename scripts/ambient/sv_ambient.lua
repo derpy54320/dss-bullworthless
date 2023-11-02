@@ -21,7 +21,7 @@ RegisterNetworkEventHandler("ambient:spawnPed",function(player,area,x,y,z)
 	if gPeds.n < 100 then
 		validate_peds()
 	end
-	if gPeds.n < 100 and gPlayers[player] and is_spawn_clear(area,x,y,z,1) then
+	if gPeds.n < 100 and gPlayers[player] and is_spawn_clear(area,x,y,z,15) then
 		local ped = net.basync.create_ped(math.random(3,48))
 		local id = ped:get_id()
 		ped:set_area(area)
