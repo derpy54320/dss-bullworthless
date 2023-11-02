@@ -1,5 +1,6 @@
 # Bullworthless!
-A simple freeroam server that's up most the time for anyone to play on.
+A freeroam server where I may be adding whatever I feel like.
+If you want to make some stuff for it too, feel free to reach out on [discord](https://discord.gg/r6abc7Avpm) or start a discussion on github.
 
 # Connect
 1. Download and install the [latest version of DSL](http://bullyscripting.net/downloads.html#dsl).
