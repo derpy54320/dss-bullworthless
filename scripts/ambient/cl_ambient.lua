@@ -37,18 +37,13 @@ function main()
 		if can_make_spawns() then
 			local x,y,z = PedFindRandomSpawnPosition(gPlayer)
 			if x ~= 9999 and not is_spawn_occupied(x,y,z,1) then
-				local index = 1
 				local timer = GetTimer()
-				while times[index] do
-					if timer >= times[index] then
-						table.remove(times,index)
-					else
-						index = index + 1
-					end
+				while timer >= times[1] do
+					table.remove(times,1)
 				end
-				if index <= SPAWN_BURST then
+				if table.getn(times) <= SPAWN_BURST then
 					SendNetworkEvent("ambient:spawnPed",AreaGetVisible(),x,y,z)
-					times[index] = timer + SPAWN_TIMER
+					table.insert(times,timer+SPAWN_TIMER)
 				end
 			end
 		end
@@ -64,14 +59,14 @@ function main()
 				local v = ped:get_ped()
 				if PedIsValid(v) then
 					if ped:is_owner() then
-						if not wandering[ped] then
+						if not wandering[v] then
 							PedWander(v)
-							wandering[ped] = true
+							wandering[v] = true
 						end
-					elseif wandering[ped] then
+					elseif wandering[v] then
 						PedStop(v)
 						PedClearObjectives(v)
-						wandering[ped] = nil
+						wandering[v] = nil
 					end
 				end
 			end
