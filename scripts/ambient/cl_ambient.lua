@@ -88,3 +88,19 @@ function is_spawn_occupied(x1,y1,z1,range)
 	end
 	return false
 end
+
+CreateThread(function()
+	while true do
+		local count = 0
+		for ped in net.basync.all_peds() do
+			count = count + 1
+		end
+		SetTextFont("Arial")
+		SetTextBlack()
+		SetTextColor(0,0,0,255)
+		SetTextOutline(255,255,255,255)
+		SetTextPosition(0.5,0.02)
+		DrawText(GetPoolUsage("PED").." / "..count)
+		Wait(0)
+	end
+end)
