@@ -5,6 +5,7 @@ gPeds = {n = 0}
 -- player events
 RegisterNetworkEventHandler("ambient:initPlayer",function(player)
 	local ids = {}
+	validate_peds()
 	for i,ped in ipairs(gPeds) do
 		ids[i] = ped:get_id()
 	end
@@ -17,6 +18,9 @@ end)
 
 -- spawn events
 RegisterNetworkEventHandler("ambient:spawnPed",function(player,area,x,y,z)
+	if gPeds.n < 100 then
+		validate_peds()
+	end
 	if gPeds.n < 100 and gPlayers[player] and is_spawn_clear(area,x,y,z,1) then
 		local ped = net.basync.create_ped(math.random(3,48))
 		local id = ped:get_id()
@@ -42,4 +46,14 @@ function is_spawn_clear(area,x1,y1,z1,range)
 		end
 	end
 	return true
+end
+function validate_peds()
+	local index = 1
+	while index <= gPeds.n do
+		if gPeds[index]:is_valid() then
+			index = index + 1
+		else
+			table.remove(gPeds,index)
+		end
+	end
 end
