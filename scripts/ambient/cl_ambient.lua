@@ -15,7 +15,6 @@ RegisterNetworkEventHandler("ambient:setPeds",function(ids)
 			PrintWarning("ambient:setPeds failed to get ped #"..id)
 		end
 	end
-	print("...")
 end)
 RegisterNetworkEventHandler("ambient:addPed",function(id)
 	local ped = net.basync.get_ped_from_server(id,true)
@@ -24,7 +23,6 @@ RegisterNetworkEventHandler("ambient:addPed",function(id)
 	else
 		PrintWarning("ambient:addPed failed to get ped #"..id)
 	end
-	print("!")
 end)
 
 -- main
@@ -38,7 +36,7 @@ function main()
 	while true do
 		if can_make_spawns() then
 			local x,y,z = PedFindRandomSpawnPosition()
-			if x ~= 9999 and is_spawn_occupied(x,y,z,1) then
+			if x ~= 9999 and not is_spawn_occupied(x,y,z,1) then
 				local index = 1
 				local timer = GetTimer()
 				while times[index] do
@@ -48,10 +46,9 @@ function main()
 						index = index + 1
 					end
 				end
-				if index < SPAWN_BURST then
+				if index <= SPAWN_BURST then
 					SendNetworkEvent("ambient:spawnPed",AreaGetVisible(),x,y,z)
 					times[index] = timer + SPAWN_TIMER
-					print("?")
 				end
 			end
 		end
