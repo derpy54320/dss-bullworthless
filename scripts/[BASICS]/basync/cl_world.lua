@@ -62,10 +62,9 @@ function MissionSetup()
 		Wait(0)
 	end
 	function MissionCleanup()
-		while AreaIsLoading() do
-			Wait(0)
+		if not AreaIsLoading() then
+			ChapterSet(chapter)
 		end
-		ChapterSet(chapter)
 		WeatherSet(weather)
 		ClockSet(hour,minute)
 		ClockSetTickRate(60)
