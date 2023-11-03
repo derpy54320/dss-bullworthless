@@ -9,7 +9,7 @@ spawn_timer 2000	# there can be spawn_burst spawns over spawn_timer milliseconds
 spawn_burst 10
 
 [DEBUGGING]
-show_debug_counter false
+show_debug_counter true
 
 [CONFIG]
 require_verson 8
