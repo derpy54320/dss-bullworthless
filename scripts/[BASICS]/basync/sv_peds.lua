@@ -88,12 +88,13 @@ function create_ped(model)
 		end
 		ped.id = basync.generate_net_id(ped)
 		for p in pairs(gPlayers) do
-			SendNetworkEvent(p,"basync:createPed",ped.id)
+			SendNetworkEvent(p,"basync:_createPed",ped.id)
 			ped.state:require_update(p)
 		end
 		basync.ping_net_id(ped.id)
 		gPeds[ped.id] = ped
 		add_cleanup_object(GetCurrentScript(),ped)
+		RunLocalEvent("basync:createPed",ped)
 		return ped
 	end
 	error("invalid ped model",2)
@@ -113,7 +114,7 @@ function mt_ped.__index:delete()
 		end
 	end
 	for p in pairs(gPlayers) do
-		SendNetworkEvent(p,"basync:deletePed",self.id)
+		SendNetworkEvent(p,"basync:_deletePed",self.id)
 	end
 	basync.release_net_id(self.id)
 	gPeds[self.id] = nil
@@ -259,13 +260,13 @@ function mt_ped.__index:warp_out_of_vehicle()
 end
 
 -- player connection events
-RegisterNetworkEventHandler("basync:initPlayer",function(player)
+RegisterLocalEventHandler("basync:_initPlayer",function(player)
 	if gPlayers[player] then
 		destroy_player(player,gPlayers[player])
 	end
 	gPlayers[player] = create_player(player)
 	for id,ped in pairs(gPeds) do
-		SendNetworkEvent(player,"basync:createPed",id)
+		SendNetworkEvent(player,"basync:_createPed",id)
 		ped.state:require_update(player)
 	end
 end)
@@ -301,17 +302,17 @@ function destroy_player(player,data)
 end
 
 -- player ped events
-RegisterNetworkEventHandler("basync:deletePed",function(player,id)
+RegisterNetworkEventHandler("basync:_deletePed",function(player,id)
 	if gPlayers[player] then
 		local ped = basync.get_net_id(player,id)
-		if ped and ped == gPeds[id] and ped.state.owner == player then
+		if ped and ped == gPeds[id] and ped.state.owner == player and RunLocalEvent("basync:deletePed",ped) then
 			ped:delete()
 		else
-			SendNetworkEvent(player,"basync:undeletePed",id)
+			SendNetworkEvent(player,"basync:_undeletePed",id)
 		end
 	end
 end)
-RegisterNetworkEventHandler("basync:updatePeds",function(player,all_changes)
+RegisterNetworkEventHandler("basync:_updatePeds",function(player,all_changes)
 	if not gPlayers[player] then
 		return
 	elseif type(all_changes) ~= "table" then
@@ -329,10 +330,11 @@ RegisterNetworkEventHandler("basync:updatePeds",function(player,all_changes)
 				end
 			end
 			ped.state:apply_changes(player,changes)
+			RunLocalEvent("basync:updatePed",ped)
 		end
 	end
 end)
-RegisterNetworkEventHandler("basync:updatedPeds",function(player,all_updates)
+RegisterNetworkEventHandler("basync:_updatedPeds",function(player,all_updates)
 	if not gPlayers[player] then
 		return
 	elseif type(all_updates) ~= "table" then
@@ -353,7 +355,7 @@ RegisterNetworkEventHandler("basync:updatedPeds",function(player,all_updates)
 		end
 	end
 end)
-RegisterNetworkEventHandler("basync:visiblePeds",function(player,ids)
+RegisterNetworkEventHandler("basync:_visiblePeds",function(player,ids)
 	local data = gPlayers[player]
 	if data then
 		local before = data.visible
@@ -511,7 +513,7 @@ function send_updates()
 				all_ped_changes[n] = {id,changes,updates,full}
 			end
 		end
-		SendNetworkEvent(p,"basync:updatePeds",all_ped_changes)
+		SendNetworkEvent(p,"basync:_updatePeds",all_ped_changes)
 	end
 	for _,ped in pairs(gPeds) do
 		ped.state:finish_update()
@@ -572,20 +574,20 @@ if not GetConfigBoolean(GetScriptConfig(),"allow_debug",false) then
 end
 
 -- debug events
-RegisterNetworkEventHandler("basync:debugPed",function(player,id)
+RegisterNetworkEventHandler("basync:_debugPed",function(player,id)
 	if gPlayers[player] and net.admin.is_player_admin(player) then
 		local ped = basync.get_net_id(player,id)
 		if ped and ped == gPeds[id] then
 			local backup = ped.server
 			ped.server = nil
-			SendNetworkEvent(player,"basync:debugPed","gPeds["..id.."] = "..get_debug_string(ped))
+			SendNetworkEvent(player,"basync:_debugPed","gPeds["..id.."] = "..get_debug_string(ped))
 			ped.server = backup
 		else
-			SendNetworkEvent(player,"basync:debugPed")
+			SendNetworkEvent(player,"basync:_debugPed")
 		end
 	end
 end)
-RegisterNetworkEventHandler("basync:spawnPed",function(player,model,area,x,y,z,h)
+RegisterNetworkEventHandler("basync:_spawnPed",function(player,model,area,x,y,z,h)
 	if gPlayers[player] and net.admin.is_player_admin(player) then
 		local ped = basync.create_ped(model)
 		ped:set_position(x,y,z,h)

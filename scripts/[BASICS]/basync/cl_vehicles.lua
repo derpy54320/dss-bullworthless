@@ -120,26 +120,26 @@ function mt_vehicle.__index:get_position()
 end
 
 -- server vehicle events
-RegisterNetworkEventHandler("basync:createVehicle",function(id)
+RegisterNetworkEventHandler("basync:_createVehicle",function(id)
 	if gVehicles[id] then
 		error("a vehicle with that network id already exists",2)
 	end
 	gVehicles[id] = create_vehicle(id)
 end)
-RegisterNetworkEventHandler("basync:deleteVehicle",function(id)
+RegisterNetworkEventHandler("basync:_deleteVehicle",function(id)
 	local veh = gVehicles[id]
 	if veh then
 		veh:delete()
 		gVehicles[id] = nil
 	end
 end)
-RegisterNetworkEventHandler("basync:undeleteVehicle",function(id)
+RegisterNetworkEventHandler("basync:_undeleteVehicle",function(id)
 	local veh = gVehicles[id]
 	if veh then
 		veh.deleted = false
 	end
 end)
-RegisterNetworkEventHandler("basync:updateVehicles",function(all_vehicle_changes)
+RegisterNetworkEventHandler("basync:_updateVehicles",function(all_vehicle_changes)
 	local updated = {}
 	for _,v in ipairs(all_vehicle_changes) do
 		local id,changes,updates,full = unpack(v)
@@ -158,7 +158,7 @@ RegisterNetworkEventHandler("basync:updateVehicles",function(all_vehicle_changes
 		end
 	end
 	if next(updated) then
-		SendNetworkEvent("basync:updatedVehicles",updated)
+		SendNetworkEvent("basync:_updatedVehicles",updated)
 	end
 end)
 
@@ -226,7 +226,7 @@ function validate_vehicles()
 			else
 				veh.veh = -1 -- get rid of invalid vehicle handle
 				if veh.created and veh.state:is_owner() then
-					SendNetworkEvent("basync:deleteVehicle",veh.id)
+					SendNetworkEvent("basync:_deleteVehicle",veh.id)
 					veh.created = false
 					veh.deleted = true
 				end
@@ -290,7 +290,7 @@ function update_visible()
 	end
 	table.sort(visible)
 	if count ~= gVisible.n or is_dif_visible(visible) then
-		SendNetworkEvent("basync:visibleVehicles",visible)
+		SendNetworkEvent("basync:_visibleVehicles",visible)
 		visible.n = count
 		gVisible = visible
 	end
@@ -357,7 +357,7 @@ function set_vehicle_pos(veh)
 end
 
 -- update state (client -> server)
-RegisterLocalEventHandler("basync:updateServer",function()
+RegisterLocalEventHandler("basync:_updateServer",function()
 	local all_changes = {}
 	for id,veh in pairs(gVehicles) do
 		if VehicleIsValid(veh.veh) and veh.state:is_owner() then
@@ -379,7 +379,7 @@ RegisterLocalEventHandler("basync:updateServer",function()
 		end
 	end
 	if next(all_changes) then
-		SendNetworkEvent("basync:updateVehicles",all_changes)
+		SendNetworkEvent("basync:_updateVehicles",all_changes)
 	end
 end)
 function get_vehicle_area(veh)
@@ -437,7 +437,7 @@ function basync.spawn_vehicle_menu()
 			local model = VEHICLE_MODELS[i]
 			if model and menu:option(model) then
 				local h,x,y,z = PedGetHeading(gPlayer),PlayerGetPosXYZ()
-				SendNetworkEvent("basync:spawnVehicle",i,AreaGetVisible(),x-math.sin(h),y+math.cos(h),z,math.deg(h))
+				SendNetworkEvent("basync:_spawnVehicle",i,AreaGetVisible(),x-math.sin(h),y+math.cos(h),z,math.deg(h))
 				break
 			end
 		end
@@ -449,7 +449,7 @@ function specific_vehicle_menu(id,veh,name)
 	local menu = net.menu.create("["..id.."] "..name)
 	while menu:active() and gVehicles[id] == veh do
 		if menu:option("Show Full Server Data") then
-			SendNetworkEvent("basync:debugVehicle",id)
+			SendNetworkEvent("basync:_debugVehicle",id)
 		elseif menu:option("Show Full Client Data") then
 			local backup = veh.server
 			veh.server = nil
@@ -488,7 +488,7 @@ function specific_vehicle_menu(id,veh,name)
 end
 
 -- debug events
-RegisterNetworkEventHandler("basync:debugVehicle",function(str)
+RegisterNetworkEventHandler("basync:_debugVehicle",function(str)
 	if str then
 		basync.draw_debug_string(str)
 	else

@@ -39,13 +39,13 @@ function basync.get_time_rate()
 end
 
 -- network events
-RegisterNetworkEventHandler("basync:updateWorld",function(world)
+RegisterNetworkEventHandler("basync:_updateWorld",function(world)
 	for i,k in pairs({"chapter","weather","rate","hour","minute"}) do
 		gWorld[k] = world[i]
 	end
 	gStarted = GetTimer()
 end)
-RegisterNetworkEventHandler("basync:updateTime",function(hour,minute)
+RegisterNetworkEventHandler("basync:_updateTime",function(hour,minute)
 	if next(gWorld) then
 		gWorld.hour = hour
 		gWorld.minute = minute
@@ -111,23 +111,23 @@ function basync.run_world_menu()
 		if menu:option("Set Chapter","["..(gWorld.chapter+1).."]") then
 			local value = get_menu_value(menu,gWorld.chapter+1,1,1,7,false)
 			if value then
-				SendNetworkEvent("basync:debugChapter",value-1)
+				SendNetworkEvent("basync:_debugChapter",value-1)
 			end
 		elseif menu:option("Set Weather","["..gWorld.weather.."]") then
 			local value = get_menu_value(menu,gWorld.weather,1,0,5,false)
 			if value then
-				SendNetworkEvent("basync:debugWeather",value)
+				SendNetworkEvent("basync:_debugWeather",value)
 			end
 		elseif menu:option("Set Time",get_menu_time()) then
 			local h,m = gWorld.hour,gWorld.minute
 			local value = get_menu_value(menu,h*60+m,15,0,1425,true)
 			if value then
-				SendNetworkEvent("basync:debugTime",math.floor(value/60),math.floor(math.mod(value,60)))
+				SendNetworkEvent("basync:_debugTime",math.floor(value/60),math.floor(math.mod(value,60)))
 			end
 		elseif menu:option("Set Time Rate","["..gWorld.rate.."]") then
 			local value = get_menu_value(menu,gWorld.rate,100,0,10000,false)
 			if value then
-				SendNetworkEvent("basync:debugTimeRate",value)
+				SendNetworkEvent("basync:_debugTimeRate",value)
 			end
 		end
 		menu:draw()

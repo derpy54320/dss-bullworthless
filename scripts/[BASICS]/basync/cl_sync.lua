@@ -5,7 +5,7 @@ local hz
 CreateAdvancedThread("GAME2",function() -- runs after normal game threads so any updates to ped state by other scripts should be caught
 	local started
 	local updates = 0
-	SendNetworkEvent("basync:initPlayer")
+	SendNetworkEvent("basync:_initPlayer")
 	while not SystemIsReady() do
 		Wait(0)
 	end
@@ -19,19 +19,19 @@ CreateAdvancedThread("GAME2",function() -- runs after normal game threads so any
 			if target - updates > 1 then
 				--PrintWarning("missed "..(target - updates - 1).." tick(s)")
 			end
-			RunLocalEvent("basync:updateServer")
+			RunLocalEvent("basync:_updateServer")
 			--DrawRectangle(0,0,1,0.01,255,0,0,255)
 			updates = target
 		end
 		Wait(0)
 	end
 end)
-RegisterNetworkEventHandler("basync:setRate",function(v)
+RegisterNetworkEventHandler("basync:_setRate",function(v)
 	if v <= 0 then
 		error("invalid refresh rate: "..tostring(v))
 	end
 	hz = v
 end)
-RegisterNetworkEventHandler("basync:networkId",function(id)
-	SendNetworkEvent("basync:networkId",id)
+RegisterNetworkEventHandler("basync:_networkId",function(id)
+	SendNetworkEvent("basync:_networkId",id)
 end)

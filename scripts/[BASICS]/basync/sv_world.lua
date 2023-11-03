@@ -67,16 +67,16 @@ end
 function update_world(player)
 	local world = {gWorld.chapter,gWorld.weather,gWorld.rate,basync.get_time()}
 	if player then
-		SendNetworkEvent(player,"basync:updateWorld",world)
+		SendNetworkEvent(player,"basync:_updateWorld",world)
 		return
 	end
 	for player in pairs(gPlayers) do
-		SendNetworkEvent(player,"basync:updateWorld",world)
+		SendNetworkEvent(player,"basync:_updateWorld",world)
 	end
 end
 
 -- player events
-RegisterNetworkEventHandler("basync:initPlayer",function(player)
+RegisterLocalEventHandler("basync:_initPlayer",function(player)
 	gPlayers[player] = true
 	update_world(player)
 end)
@@ -90,7 +90,7 @@ function main()
 		if gWorld.rate ~= 0 then
 			local h,m = basync.get_time()
 			for player in pairs(gPlayers) do
-				SendNetworkEvent(player,"basync:updateTime",h,m)
+				SendNetworkEvent(player,"basync:_updateTime",h,m)
 			end
 		end
 		Wait(1000)
@@ -103,22 +103,22 @@ if not GetConfigBoolean(GetScriptConfig(),"allow_debug",false) then
 end
 
 -- debug events
-RegisterNetworkEventHandler("basync:debugChapter",function(player,chapter)
+RegisterNetworkEventHandler("basync:_debugChapter",function(player,chapter)
 	if net.admin and net.admin.is_player_admin(player) then
 		pcall(basync.set_chapter,chapter)
 	end
 end)
-RegisterNetworkEventHandler("basync:debugWeather",function(player,weather)
+RegisterNetworkEventHandler("basync:_debugWeather",function(player,weather)
 	if net.admin and net.admin.is_player_admin(player) then
 		pcall(basync.set_weather,weather)
 	end
 end)
-RegisterNetworkEventHandler("basync:debugTime",function(player,hour,minute)
+RegisterNetworkEventHandler("basync:_debugTime",function(player,hour,minute)
 	if net.admin and net.admin.is_player_admin(player) then
 		pcall(basync.set_time,hour,minute)
 	end
 end)
-RegisterNetworkEventHandler("basync:debugTimeRate",function(player,rate)
+RegisterNetworkEventHandler("basync:_debugTimeRate",function(player,rate)
 	if net.admin and net.admin.is_player_admin(player) then
 		pcall(basync.set_time_rate,rate)
 	end

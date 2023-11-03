@@ -166,13 +166,13 @@ function mt_ped.__index:get_vehicle()
 end
 
 -- server ped events
-RegisterNetworkEventHandler("basync:createPed",function(id)
+RegisterNetworkEventHandler("basync:_createPed",function(id)
 	if gPeds[id] then
 		error("a ped with that network id already exists",2)
 	end
 	gPeds[id] = create_ped(id)
 end)
-RegisterNetworkEventHandler("basync:deletePed",function(id)
+RegisterNetworkEventHandler("basync:_deletePed",function(id)
 	local ped = gPeds[id]
 	if ped then
 		if PedIsValid(ped.ped) and ped.ped ~= gPlayer then
@@ -181,13 +181,13 @@ RegisterNetworkEventHandler("basync:deletePed",function(id)
 		gPeds[id] = nil
 	end
 end)
-RegisterNetworkEventHandler("basync:undeletePed",function(id)
+RegisterNetworkEventHandler("basync:_undeletePed",function(id)
 	local ped = gPeds[id]
 	if ped then
 		ped.deleted = false -- server didn't delete the ped, so we'll unmark them
 	end
 end)
-RegisterNetworkEventHandler("basync:updatePeds",function(all_ped_changes)
+RegisterNetworkEventHandler("basync:_updatePeds",function(all_ped_changes)
 	local updated = {}
 	for _,v in ipairs(all_ped_changes) do
 		local id,changes,updates,full = unpack(v)
@@ -206,7 +206,7 @@ RegisterNetworkEventHandler("basync:updatePeds",function(all_ped_changes)
 		end
 	end
 	if next(updated) then
-		SendNetworkEvent("basync:updatedPeds",updated)
+		SendNetworkEvent("basync:_updatedPeds",updated)
 	end
 end)
 
@@ -344,7 +344,7 @@ function validate_peds() -- create / delete peds
 					player = ped
 					--space = space + 1
 				elseif GetTimer() >= gPlayerWarning then
-					SendNetworkEvent("basync:kickMe","multiple player peds")
+					SendNetworkEvent("basync:_kickMe","multiple player peds")
 					gPlayerWarning = GetTimer() + 1000
 				end
 			else -- non-player ped (use DBSC)
@@ -355,7 +355,7 @@ function validate_peds() -- create / delete peds
 				else
 					ped.ped = -1 -- get rid of invalid ped handle (or get rid of gPlayer if this isn't meant to be the player ped)
 					if ped.created and ped.state:is_owner() then
-						SendNetworkEvent("basync:deletePed",ped.id)
+						SendNetworkEvent("basync:_deletePed",ped.id)
 						ped.created = false
 						ped.deleted = true
 					end
@@ -435,7 +435,7 @@ function update_visible()
 	end
 	table.sort(visible)
 	if count ~= gVisible.n or is_dif_visible(visible) then
-		SendNetworkEvent("basync:visiblePeds",visible)
+		SendNetworkEvent("basync:_visiblePeds",visible)
 		visible.n = count
 		gVisible = visible
 	end
@@ -610,7 +610,7 @@ function set_ped_pos(ped)
 end
 
 -- update state (client -> server)
-RegisterLocalEventHandler("basync:updateServer",function()
+RegisterLocalEventHandler("basync:_updateServer",function()
 	local all_changes = {}
 	for id,ped in pairs(gPeds) do
 		if PedIsValid(ped.ped) and ped.state:is_owner() then
@@ -638,7 +638,7 @@ RegisterLocalEventHandler("basync:updateServer",function()
 		end
 	end
 	if next(all_changes) then
-		SendNetworkEvent("basync:updatePeds",all_changes)
+		SendNetworkEvent("basync:_updatePeds",all_changes)
 	end
 end)
 function get_ped_pos(ped)
@@ -725,7 +725,7 @@ function basync.spawn_ped_menu()
 			local model = PED_MODELS[i]
 			if model and menu:option(model) then
 				local h,x,y,z = PedGetHeading(gPlayer),PlayerGetPosXYZ()
-				SendNetworkEvent("basync:spawnPed",i,AreaGetVisible(),x-math.sin(h),y+math.cos(h),z,math.deg(h))
+				SendNetworkEvent("basync:_spawnPed",i,AreaGetVisible(),x-math.sin(h),y+math.cos(h),z,math.deg(h))
 				break
 			end
 		end
@@ -737,7 +737,7 @@ function specific_ped_menu(id,ped,name)
 	local menu = net.menu.create("["..id.."] "..name)
 	while menu:active() and gPeds[id] == ped do
 		if menu:option("Show Full Server Data") then
-			SendNetworkEvent("basync:debugPed",id)
+			SendNetworkEvent("basync:_debugPed",id)
 		elseif menu:option("Show Full Client Data") then
 			local backup_1 = ped.server
 			local backup_2 = ped.node_t
@@ -803,7 +803,7 @@ function get_control_ped_status(ped)
 end
 
 -- debug events
-RegisterNetworkEventHandler("basync:debugPed",function(str)
+RegisterNetworkEventHandler("basync:_debugPed",function(str)
 	if str then
 		basync.draw_debug_string(str)
 	else

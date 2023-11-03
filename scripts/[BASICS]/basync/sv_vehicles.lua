@@ -62,12 +62,13 @@ function create_vehicle(model)
 		end
 		veh.id = basync.generate_net_id(veh)
 		for p in pairs(gPlayers) do
-			SendNetworkEvent(p,"basync:createVehicle",veh.id)
+			SendNetworkEvent(p,"basync:_createVehicle",veh.id)
 			veh.state:require_update(p)
 		end
 		basync.ping_net_id(veh.id)
 		gVehicles[veh.id] = veh
 		add_cleanup_object(GetCurrentScript(),veh)
+		RunLocalEvent("basync:createVehicle",veh)
 		return veh
 	end
 	error("invalid vehicle model",2)
@@ -80,7 +81,7 @@ end
 function mt_vehicle.__index:delete()
 	validate_vehicle(self,2)
 	for p in pairs(gPlayers) do
-		SendNetworkEvent(p,"basync:deleteVehicle",self.id)
+		SendNetworkEvent(p,"basync:_deleteVehicle",self.id)
 	end
 	basync.release_net_id(self.id)
 	gVehicles[self.id] = nil
@@ -220,13 +221,13 @@ function mt_vehicle.__index:set_seat(seat,ped)
 end
 
 -- player connection events
-RegisterNetworkEventHandler("basync:initPlayer",function(player)
+RegisterLocalEventHandler("basync:_initPlayer",function(player)
 	if gPlayers[player] then
 		destroy_player(player,gPlayers[player])
 	end
 	gPlayers[player] = create_player(player)
 	for id,veh in pairs(gVehicles) do
-		SendNetworkEvent(player,"basync:createVehicle",id)
+		SendNetworkEvent(player,"basync:_createVehicle",id)
 		veh.state:require_update(player)
 	end
 end)
@@ -249,17 +250,17 @@ function destroy_player(player,data)
 end
 
 -- player vehicle events
-RegisterNetworkEventHandler("basync:deleteVehicle",function(player,id)
+RegisterNetworkEventHandler("basync:_deleteVehicle",function(player,id)
 	if gPlayers[player] then
 		local veh = basync.get_net_id(player,id)
-		if veh and veh == gVehicles[id] and veh.state.owner == player then
+		if veh and veh == gVehicles[id] and veh.state.owner == player and RunLocalEvent("basync:deleteVehicle") then
 			veh:delete()
 		else
-			SendNetworkEvent(player,"basync:undeleteVehicle",id)
+			SendNetworkEvent(player,"basync:_undeleteVehicle",id)
 		end
 	end
 end)
-RegisterNetworkEventHandler("basync:updateVehicles",function(player,all_changes)
+RegisterNetworkEventHandler("basync:_updateVehicles",function(player,all_changes)
 	if not gPlayers[player] then
 		return
 	elseif type(all_changes) ~= "table" then
@@ -277,10 +278,11 @@ RegisterNetworkEventHandler("basync:updateVehicles",function(player,all_changes)
 				end
 			end
 			veh.state:apply_changes(player,changes)
+			RunLocalEvent("basync:updateVehicle",veh)
 		end
 	end
 end)
-RegisterNetworkEventHandler("basync:updatedVehicles",function(player,all_updates)
+RegisterNetworkEventHandler("basync:_updatedVehicles",function(player,all_updates)
 	if not gPlayers[player] then
 		return
 	elseif type(all_updates) ~= "table" then
@@ -301,7 +303,7 @@ RegisterNetworkEventHandler("basync:updatedVehicles",function(player,all_updates
 		end
 	end
 end)
-RegisterNetworkEventHandler("basync:visibleVehicles",function(player,ids)
+RegisterNetworkEventHandler("basync:_visibleVehicles",function(player,ids)
 	local data = gPlayers[player]
 	if data then
 		local before = data.visible
@@ -454,7 +456,7 @@ function send_updates()
 				all_veh_changes[n] = {id,changes,updates,full}
 			end
 		end
-		SendNetworkEvent(p,"basync:updateVehicles",all_veh_changes)
+		SendNetworkEvent(p,"basync:_updateVehicles",all_veh_changes)
 	end
 	for _,veh in pairs(gVehicles) do
 		veh.state:finish_update()
@@ -515,20 +517,20 @@ if not GetConfigBoolean(GetScriptConfig(),"allow_debug",false) then
 end
 
 -- debug events
-RegisterNetworkEventHandler("basync:debugVehicle",function(player,id)
+RegisterNetworkEventHandler("basync:_debugVehicle",function(player,id)
 	if gPlayers[player] and net.admin.is_player_admin(player) then
 		local veh = basync.get_net_id(player,id)
 		if veh and veh == gVehicles[id] then
 			local backup = veh.server
 			veh.server = nil
-			SendNetworkEvent(player,"basync:debugVehicle","gVehicles["..id.."] = "..get_debug_string(veh))
+			SendNetworkEvent(player,"basync:_debugVehicle","gVehicles["..id.."] = "..get_debug_string(veh))
 			veh.server = backup
 		else
-			SendNetworkEvent(player,"basync:debugVehicle")
+			SendNetworkEvent(player,"basync:_debugVehicle")
 		end
 	end
 end)
-RegisterNetworkEventHandler("basync:spawnVehicle",function(player,model,area,x,y,z,h)
+RegisterNetworkEventHandler("basync:_spawnVehicle",function(player,model,area,x,y,z,h)
 	if gPlayers[player] and net.admin.is_player_admin(player) then
 		local veh = basync.create_vehicle(model)
 		veh:set_position(x,y,z,h)
