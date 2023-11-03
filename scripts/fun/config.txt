@@ -1,3 +1,4 @@
 auto_start false
 main_script sv_fun.lua
-client_script cl_fun.lua
+client_script cl_model.lua
+client_script cl_style.lua
