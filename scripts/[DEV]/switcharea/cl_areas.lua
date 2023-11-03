@@ -1,7 +1,7 @@
 RegisterLocalEventHandler("menu:openMain",function(add)
-	if net.admin and net.admin.is_admin() then
+	--if net.admin and net.admin.is_admin() then
 		add("Switch Area","Switch to another area.",M_Areas)
-	end
+	--end
 end)
 function MissionCleanup()
 	AreaDisableCameraControlForTransition(false)
