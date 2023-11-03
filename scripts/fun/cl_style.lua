@@ -4,7 +4,7 @@ function main()
 		GiveWeaponToPlayer(437,1)
 	end
 	while true do
-		if IsKeyBeingPressed("G",0) or IsKeyBeingPressed("G",1) then
+		if (IsKeyBeingPressed("G",0) or IsKeyBeingPressed("G",1)) and PedMePlaying(gPlayer,"DEFAULT_KEY",true) then
 			if player then
 				PedSetActionTree(gPlayer,"","")
 			end
