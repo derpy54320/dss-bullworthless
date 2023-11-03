@@ -1,8 +1,8 @@
 LoadScript("unique.lua")
 
 -- config
-SPAWN_DISTANCE = GetConfigNumber(GetScriptConfig(),"spawn_distance",0)
-DESPAWN_DISTANCE = GetConfigNumber(GetScriptConfig(),"despawn_distance",0)
+SPAWN_DISTANCE = GetConfigNumber(GetScriptConfig(),"spawn_distance",0) ^ 2
+DESPAWN_DISTANCE = GetConfigNumber(GetScriptConfig(),"despawn_distance",0) ^ 2
 SPAWN_LIMIT_TOTAL = GetConfigNumber(GetScriptConfig(),"spawn_limit_total",0)
 SPAWN_LIMIT_NEAR = GetConfigNumber(GetScriptConfig(),"spawn_limit_near",0)
 SPAWN_NEAR_DIST = GetConfigNumber(GetScriptConfig(),"spawn_near_dist",0) ^ 2
@@ -117,8 +117,8 @@ function main()
 		validate_peds()
 		for i,ped in ipairs(gPeds) do
 			if not is_ped_needed(ped) then
-				--ped:delete()
-				--table.remove(gPeds,i)
+				ped:delete()
+				table.remove(gPeds,i)
 				break
 			end
 		end
