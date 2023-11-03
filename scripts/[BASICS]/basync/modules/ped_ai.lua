@@ -23,3 +23,13 @@ end)
 module:set_func(function(ped,value)
 	
 end)
+
+-- shared methods
+function mod_shared:get_task()
+	validate_ped(self,2)
+end
+
+-- server methods
+function mod_server:set_task(value)
+	validate_ped(self,2)
+end

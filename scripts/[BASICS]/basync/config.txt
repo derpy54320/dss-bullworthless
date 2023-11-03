@@ -21,7 +21,10 @@ vehicle_despawn_distance 60
 
 [SYNC_MODULES]
 client_file modules/ped_actions.lua		# all client_files starting with "modules/" are loaded as sync modules
+client_file modules/ped_ai.lua
 client_file modules/ped_flags.lua
+client_file modules/ped_punishment.lua
+client_file modules/ped_speech.lua
 client_file modules/ped_stats.lua
 client_file modules/ped_target.lua
 client_file modules/ped_throttle.lua
