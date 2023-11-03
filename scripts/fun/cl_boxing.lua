@@ -10,7 +10,6 @@ function main()
 				SetTextColor(255,255,255,255)
 				DrawText("Press JUMP to get in the ring.")
 			end
-			Wait(0)
 		end
 		Wait(0)
 	end
