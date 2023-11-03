@@ -3,6 +3,7 @@ function main()
 		if PlayerIsInAreaXYZ(-711.54,372.19,293.91,1) and PedMePlaying(gPlayer,"Default_KEY",true) then
 			if IsButtonBeingPressed(8,0) then
 				PlayerSetPosSimple(PlayerGetPosXYZ(),374,295)
+				PedSetActionNode(gPlayer,"/G","")
 			else
 				SetTextFont("Comic Sans MS")
 				SetTextBold()
