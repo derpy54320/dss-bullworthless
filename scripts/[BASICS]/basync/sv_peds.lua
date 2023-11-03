@@ -6,6 +6,11 @@ LoadScript("utility/models.lua")
 LoadScript("utility/modules.lua")
 LoadScript("utility/state.lua")
 
+-- TODO: send events for vehicle / veh_id instantly instead of in normal ped updates (for timing)
+-- TODO: occupy vehicle seats when players report a ped in a vehicle
+-- TODO: make a module for speech
+-- TODO: make a module for punishment level
+
 -- config
 REASSIGN_DIST = 1
 ALLOW_PASSENGERS = GetConfigBoolean(GetScriptConfig(),"allow_passengers",false)

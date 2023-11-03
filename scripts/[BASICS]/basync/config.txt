@@ -11,10 +11,11 @@ allow_passengers false		# use experimental passenger support (can cause issues o
 
 [PREFERENCES]
 slide_time_ms 150
-ped_pool_target 21			# if there are over 20 peds when a ped is created (not including the newly created ped), a single ambient ped will be deleted instantly
+ped_stop_alt_method true		# limit the population instead of using StopPedProduction (needed if you use a script that relies on PedFindRandomSpawnPosition)
+ped_pool_target 21				# if there are over 20 peds when a ped is created (not including the newly created ped), a single ambient ped will be deleted instantly
 ped_spawn_distance 50
 ped_despawn_distance 60
-vehicle_pool_target 10		# the normal limit is 15
+vehicle_pool_target 10			# the normal limit is 15
 vehicle_spawn_distance 50
 vehicle_despawn_distance 60
 

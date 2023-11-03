@@ -7,7 +7,7 @@ LoadScript("utility/nodes.lur")
 LoadScript("utility/state.lua")
 
 -- config
-ALT_PED_STOP_METHOD = true
+ALT_PED_STOP_METHOD = GetConfigBoolean(GetScriptConfig(),"ped_stop_alt_method",false)
 FORCE_PLAYER_AI = GetConfigBoolean(GetScriptConfig(),"force_player_ai",false)
 SLIDE_TIME_SECS = GetConfigNumber(GetScriptConfig(),"slide_time_ms",0) / 1000
 PED_POOL_TARGET = GetConfigNumber(GetScriptConfig(),"ped_pool_target",0)
@@ -398,9 +398,8 @@ function validate_peds() -- create / delete peds
 			local x,y,z = unpack(ped.server.pos)
 			ped.ped = PedCreateXYZ(ped.server.model,x,y,z) -- create the closest peds that there is space for
 			if not PedIsValid(ped.ped) then
-				DrawRectangle(0,0,1,1,255,0,0,255)
-				Wait(0)
-				while true do end
+				PrintError("failed to create ped")
+				ped.ped = -1
 			end
 			ped.state:apply_changes({},nil,true) -- force a full update
 		end
