@@ -53,6 +53,7 @@ function main()
 						table.insert(times,timer+SPAWN_TIMER)
 					end
 					SendNetworkEvent("ambient:spawnPed",AreaGetVisible(),x,y,z)
+					print("!")
 				end
 			end
 		end
