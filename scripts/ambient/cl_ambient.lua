@@ -1,5 +1,8 @@
-SPAWN_TIMER = 2000 -- only SPAWN_BURST spawns can be sent over SPAWN_TIMER
-SPAWN_BURST = 10
+-- config
+SPAWN_DISTANCE = GetConfigNumber(GetScriptConfig(),"spawn_distance",0)
+SPAWN_SPACING = GetConfigNumber(GetScriptConfig(),"spawn_spacing",0) ^ 2
+SPAWN_TIMER = GetConfigNumber(GetScriptConfig(),"spawn_timer",0)
+SPAWN_BURST = GetConfigNumber(GetScriptConfig(),"spawn_burst",0)
 
 -- globals
 gPeds = {}
@@ -34,17 +37,22 @@ function main()
 	end
 	Wait(2000) -- TODO: this shouldn't be needed, it's just a bandaid for the server sending ids before basync initialized the player
 	SendNetworkEvent("ambient:initPlayer")
+	if GetConfigBoolean(GetScriptConfig(),"show_debug_counter",false) then
+		CreateThread("T_Debug")
+	end
 	while true do
 		if can_make_spawns() then
 			local x,y,z = PedFindRandomSpawnPosition(gPlayer)
-			if x ~= 9999 and not is_spawn_occupied(x,y,z,1) then
+			if x ~= 9999 and not is_spawn_occupied(x,y,z) and DistanceBetweenCoords3d(x,y,z,PlayerGetPosXYZ()) >= SPAWN_DISTANCE then
 				local timer = GetTimer()
 				while times[1] and timer >= times[1] do
 					table.remove(times,1)
 				end
 				if table.getn(times) <= SPAWN_BURST then
+					if SPAWN_TIMER > 0 then
+						table.insert(times,timer+SPAWN_TIMER)
+					end
 					SendNetworkEvent("ambient:spawnPed",AreaGetVisible(),x,y,z)
-					table.insert(times,timer+SPAWN_TIMER)
 				end
 			end
 		end
@@ -78,20 +86,19 @@ end
 function can_make_spawns()
 	return not AreaIsLoading() and GetCutsceneRunning() == 0
 end
-function is_spawn_occupied(x1,y1,z1,range)
-	range = range * range
+function is_spawn_occupied(x1,y1,z1)
 	for ped in AllPeds() do
 		local x2,y2,z2 = PedGetPosXYZ(ped)
 		local dx,dy,dz = x2-x1,y2-y1,z2-z1
-		if dx*dx+dy*dy+dz*dz < range then
+		if dx*dx+dy*dy+dz*dz < SPAWN_SPACING then
 			return true
 		end
 	end
 	return false
 end
 
-CreateThread(function()
-	Wait(1000) -- TODO: get rid of this for better timing with basync starting
+-- debug
+function T_Debug()
 	while true do
 		local count = 0
 		for ped in net.basync.all_peds() do
@@ -105,4 +112,4 @@ CreateThread(function()
 		DrawText(GetPoolUsage("PED").." / "..count)
 		Wait(0)
 	end
-end)
+end
