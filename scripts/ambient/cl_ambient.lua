@@ -72,7 +72,6 @@ function main()
 							PedWander(v)
 							PedSetEmotionTowardsPed(v,gPlayer,0)
 							PedSetPedToTypeAttitude(v,13,0)
-							PedAttackPlayer(v,3)
 							wandering[v] = true
 						end
 					elseif wandering[v] then
