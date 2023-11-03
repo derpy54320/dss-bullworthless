@@ -30,12 +30,9 @@ end)
 RegisterNetworkEventHandler("ambient:spawnPed",function(player,area,x,y,z)
 	if gPlayers[player] then
 		validate_peds()
-		print("1. validate")
 		if gPeds.n < SPAWN_LIMIT_TOTAL and is_spawn_clear(area,x,y,z) and is_player_uncluttered(player) then
-			print("2. get model")
 			local model = get_random_model()
 			if model then
-				print("3. spawn")
 				local ped = net.basync.create_ped(model)
 				local id = ped:get_id()
 				ped:set_area(area)
@@ -120,8 +117,8 @@ function main()
 		validate_peds()
 		for i,ped in ipairs(gPeds) do
 			if not is_ped_needed(ped) then
-				ped:delete()
-				table.remove(gPeds,i)
+				--ped:delete()
+				--table.remove(gPeds,i)
 				break
 			end
 		end
