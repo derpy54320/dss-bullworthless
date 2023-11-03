@@ -106,6 +106,9 @@ function get_random_model()
 			end
 		end
 	end
+	if count ~= 0 then
+		return models[math.random(1,count)]
+	end
 end
 
 -- main
