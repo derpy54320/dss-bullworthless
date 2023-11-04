@@ -1,0 +1,8 @@
+[SCRIPTS]
+client_script cl_main.lua
+client_script cl_models.lua
+client_script cl_nodes.lua
+
+[UTILITY]
+client_file utility/models.lua
+client_file utility/nodes.lur
