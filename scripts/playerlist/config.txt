@@ -1,0 +1,3 @@
+require_version 5
+main_script sv_list.lua
+client_script cl_list.lua
