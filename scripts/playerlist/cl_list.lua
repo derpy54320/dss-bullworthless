@@ -25,7 +25,7 @@ function main()
 end
 function T_List()
 	while true do
-		local x,y,w,h = 1-0.1/GetDisplayAspectRatio(),0.3
+		local x,y,w,h = 1-0.09/GetDisplayAspectRatio(),0.32
 		for _,v in ipairs(gSorted) do
 			SetTextFont("Arial")
 			SetTextBlack()
