@@ -1,4 +1,4 @@
-local STAY_TIME = 1000
+local STAY_TIME = 4500
 local FADE_OUT = 500
 local gPlayers = {}
 local gSorted = {}
