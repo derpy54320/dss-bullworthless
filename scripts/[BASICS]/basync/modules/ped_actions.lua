@@ -103,6 +103,7 @@ local ACTION_TREES = { -- allowed action trees
 local NODE_BLACKLIST = { -- patterns for unallowed nodes
 	-- nodes should be in all caps and start with "/G" not "/GLOBAL"
 	"^/G/TAGS",
+	"^/G/SIGNS",
 	"^/G/VEHICLES/SKATEBOARD",
 	"^/G/AMBIENT/TALKING/TALKING/GEN/SPEECHANIMS/SPAWNS",
 }
