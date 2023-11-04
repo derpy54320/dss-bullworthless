@@ -29,8 +29,9 @@ function main()
 end
 function T_List()
 	while true do
-		local x,y,w,h = 1-0.09/GetDisplayAspectRatio(),0.32
-		local opacity = 1-- - (GetTimer() - gOpened) / FADE_OUT
+		local x,y,w,h = 1-0.095/GetDisplayAspectRatio(),0.32
+		local opacity = 1 - (GetTimer() - gOpened) / FADE_OUT
+		TextPrintString(string.format("%.1f",opacity),1,1)
 		if opacity > 0 then
 			for _,v in ipairs(gSorted) do
 				SetTextFont("Arial")
