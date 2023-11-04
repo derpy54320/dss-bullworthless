@@ -28,6 +28,10 @@ function main()
 	end
 end
 function T_List()
+	local show_id = false
+	if net.admin and net.admin:is_mod() then
+		show_id = true
+	end
 	while true do
 		local x,y,w,h = 1-0.095/GetDisplayAspectRatio(),0.305
 		local opacity = 1 - ((GetTimer() - gOpened) - STAY_TIME) / FADE_OUT
@@ -43,7 +47,11 @@ function T_List()
 				SetTextAlign("R","T")
 				SetTextScale(0.7)
 				SetTextPosition(x,y)
-				w,h = DrawText(v[2])
+				if show_id then
+					w,h = DrawText(v[2].." ["..v[1].."]")
+				else
+					w,h = DrawText(v[2])
+				end
 				y = y + h
 			end
 		end
