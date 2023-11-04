@@ -29,7 +29,7 @@ function main()
 end
 function T_List()
 	while true do
-		local x,y,w,h = 1-0.095/GetDisplayAspectRatio(),0.32
+		local x,y,w,h = 1-0.095/GetDisplayAspectRatio(),0.31
 		local opacity = 1 - ((GetTimer() - gOpened) - STAY_TIME) / FADE_OUT
 		if opacity > 1 then
 			opacity = 1
