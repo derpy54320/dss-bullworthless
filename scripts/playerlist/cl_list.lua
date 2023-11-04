@@ -15,7 +15,7 @@ function main()
 		Wait(0)
 	end
 	while true do
-		if IsButtonBeingPressed(3,0) then
+		if IsButtonBeingPressed(3,0) and not (net.menu and net.menu.is_active()) then
 			if not thread then
 				thread = CreateAdvancedThread("PRE_FADE","T_List")
 			end
