@@ -1,6 +1,7 @@
 # Bullworthless!
 A freeroam server where I may be adding whatever I feel like.
 If you want to make some stuff for it too, feel free to reach out on [discord](https://discord.gg/r6abc7Avpm) or start a discussion on github.
+To check on progress, see [TODO.md](./TODO.md).
 
 # Connect
 1. Download and install the [latest version of DSL](http://bullyscripting.net/downloads.html#dsl).
@@ -32,6 +33,3 @@ You can use [GitHub Desktop](https://desktop.github.com/) to work on your fork.
 ## Resources
 See the [server manual](http://bullyscripting.net/server.html) and reference page for [basync](http://bullyscripting.net/basync.html).
 Also visit [bullyscripting.net](http://bullyscripting.net) for help with DSL / DSS in general.
-
-# TODO
-You can read the [TODO.md](./TODO.md) file to see what is being worked on.
