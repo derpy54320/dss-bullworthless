@@ -1,5 +1,8 @@
-gPlayers = {}
-gSorted = {}
+local STAY_TIME = 1000
+local FADE_OUT = 500
+local gPlayers = {}
+local gSorted = {}
+local gOpened
 
 RegisterNetworkEventHandler("playerlist:set",function(id,name)
 	gPlayers[id] = name
@@ -12,13 +15,14 @@ function main()
 		Wait(0)
 	end
 	while true do
-		if IsKeyBeingPressed("Z",0) then
-			if thread and IsThreadRunning(thread) then
-				TerminateThread(thread)
-				thread = nil
-			else
+		if IsButtonBeingPressed(3,0) then
+			if not thread then
 				thread = CreateAdvancedThread("PRE_FADE","T_List")
 			end
+			gOpened = GetTimer()
+		elseif thread and GetTimer() - gOpened >= STAY_TIME + FADE_OUT then
+			TerminateThread(thread)
+			thread = nil
 		end
 		Wait(0)
 	end
@@ -26,16 +30,19 @@ end
 function T_List()
 	while true do
 		local x,y,w,h = 1-0.09/GetDisplayAspectRatio(),0.32
-		for _,v in ipairs(gSorted) do
-			SetTextFont("Arial")
-			SetTextBlack()
-			SetTextColor(255,255,255,255)
-			SetTextOutline()
-			SetTextAlign("R","T")
-			SetTextScale(0.7)
-			SetTextPosition(x,y)
-			w,h = DrawText(v[2])
-			y = y + h
+		local opacity = 1 - (GetTimer() - gOpened) / FADE_OUT
+		if opacity > 0 then
+			for _,v in ipairs(gSorted) do
+				SetTextFont("Arial")
+				SetTextBlack()
+				SetTextColor(255,255,255,255*opacity)
+				SetTextOutline()
+				SetTextAlign("R","T")
+				SetTextScale(0.7)
+				SetTextPosition(x,y)
+				w,h = DrawText(v[2])
+				y = y + h
+			end
 		end
 		Wait(0)
 	end
