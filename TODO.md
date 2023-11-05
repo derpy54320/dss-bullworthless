@@ -10,6 +10,6 @@ This todo list contains things for Bullworthless *and* basync, since basync is p
 - Add a money system.
 
 ## Basync
-- Sync AI and give the server a lot of functions to control this behavior
-- Sync weapons but be sure to filter out crashy ones
-- Sync speech
+- Sync AI and give the server a lot of functions to control this behavior.
+- Sync weapons but be sure to filter out crashy ones.
+- Sync speech.
