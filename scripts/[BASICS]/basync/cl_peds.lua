@@ -1,5 +1,6 @@
 -- client ped sync
 basync = GetScriptNetworkTable()
+shared = GetScriptSharedTable(true)
 LoadScript("utility/debug.lua")
 LoadScript("utility/models.lua")
 LoadScript("utility/modules.lua")
@@ -58,7 +59,7 @@ gVisible = {} -- who the server thinks we see
 gPeds = {}
 
 -- load modules
-load_modules("ped_",mt_ped.__index,mt_ped.__index,{})
+load_modules("ped_",false,mt_ped.__index)
 
 -- shared api
 function basync.get_player_ped()
@@ -105,7 +106,6 @@ function create_ped(id)
 		deleted = false, -- if the ped was deleted while owned (makes the ped unable to be created again)
 		position = {0,0,0,0}, -- smooth position {x,y,z,h}
 		netbasics = false, -- if the stuff in "set_ped_basics" was applied
-		changecar = false, -- if we're changing vehicle
 		-- .transition is set when the ped is transitioning areas (only gPlayer)
 	},mt_ped)
 end
@@ -157,34 +157,49 @@ function mt_ped.__index:get_position()
 end
 function mt_ped.__index:get_vehicle()
 	validate_ped(self,2)
-	if self.server.veh_id ~= 0 then
-		local veh = basync.get_vehicle_from_server(self.server.veh_id)
-		if veh then
-			return veh
-		end
+	if self.vehicle and self.vehicle:is_valid() then
+		return self.vehicle
 	end
 end
 
 -- server ped events
 RegisterNetworkEventHandler("basync:_createPed",function(id)
 	if gPeds[id] then
-		error("a ped with that network id already exists",2)
+		error("ped #"..id.." already exists")
 	end
 	gPeds[id] = create_ped(id)
 end)
 RegisterNetworkEventHandler("basync:_deletePed",function(id)
 	local ped = gPeds[id]
-	if ped then
-		if PedIsValid(ped.ped) and ped.ped ~= gPlayer then
-			PedDelete(ped.ped)
-		end
-		gPeds[id] = nil
+	if not ped then
+		error("ped #"..id.." doesn't exist")
 	end
+	if PedIsValid(ped.ped) and ped.ped ~= gPlayer then
+		PedDelete(ped.ped)
+	end
+	gPeds[id] = nil
 end)
 RegisterNetworkEventHandler("basync:_undeletePed",function(id)
 	local ped = gPeds[id]
-	if ped then
-		ped.deleted = false -- server didn't delete the ped, so we'll unmark them
+	if not ped then
+		error("ped #"..id.." doesn't exist")
+	end
+	ped.deleted = false -- server didn't delete the ped, so we'll unmark them
+end)
+RegisterNetworkEventHandler("basync:_setPedVehicle",function(id,vid,seat)
+	local ped = gPeds[id]
+	if not ped then
+		error("ped #"..id.." doesn't exist")
+	end
+	if vid then
+		local veh = basync.get_vehicle_from_server(vid,true)
+		if not veh then
+			error("vehicle #"..vid.." doesn't exist")
+		end
+		ped.vehicle = veh
+		ped.seat = seat
+	else
+		ped.vehicle = nil
 	end
 end)
 RegisterNetworkEventHandler("basync:_updatePeds",function(all_ped_changes)
@@ -229,7 +244,7 @@ RegisterLocalEventHandler("PedBeingCreated",function()
 		if not nearest then
 			return -- no peds to delete
 		end
-		PrintWarning("deleted ped")
+		--PrintWarning("delete ped")
 		PedDelete(nearest.ped)
 		nearest.ped = -1
 		count = count - 1
@@ -237,7 +252,7 @@ RegisterLocalEventHandler("PedBeingCreated",function()
 end)
 
 -- main / cleanup
-function main()
+CreateAdvancedThread("PRE_GAME",function() -- runs pre-game so updates are applied before other scripts run
 	while not SystemIsReady() do
 		Wait(0)
 	end
@@ -259,7 +274,7 @@ function main()
 		update_peds()
 		Wait(0)
 	end
-end
+end)
 function MissionCleanup()
 	if PedIsValid(gDebugControlPed) then
 		PedSetControllerID(gPlayer,0)
@@ -335,7 +350,7 @@ function validate_peds() -- create / delete peds
 						PedDelete(ped.ped) -- delete the non-player ped (because it SHOULD be gPlayer)
 					end
 					setup_player(ped.server.model)
-					ped.ped = gPlayer
+					set_ped(ped,gPlayer)
 					ped.created = true
 				elseif not PedIsModel(gPlayer,ped.server.model) and ped.state:was_updated("model") then
 					setup_player(ped.server.model)
@@ -353,7 +368,7 @@ function validate_peds() -- create / delete peds
 				if PedIsValid(ped.ped) and ped.ped ~= gPlayer then
 					space = space + 1 -- space goes up for each sync ped so it represents how many peds we can have created
 				else
-					ped.ped = -1 -- get rid of invalid ped handle (or get rid of gPlayer if this isn't meant to be the player ped)
+					set_ped(ped,-1) -- get rid of invalid ped handle (or get rid of gPlayer if this isn't meant to be the player ped)
 					if ped.created and ped.state:is_owner() then
 						SendNetworkEvent("basync:_deletePed",ped.id)
 						ped.created = false
@@ -383,7 +398,7 @@ function validate_peds() -- create / delete peds
 		local ped = peds[i][1]
 		if PedIsValid(ped.ped) then
 			PedDelete(ped.ped) -- not enough space for these far away peds
-			ped.ped = -1
+			set_ped(ped,-1)
 		end
 		ped.created = false
 	end
@@ -392,18 +407,26 @@ function validate_peds() -- create / delete peds
 		local ped = peds[i][1]
 		if PedIsValid(ped.ped) and not PedIsModel(ped.ped,ped.server.model) and (not ped.state:is_owner() or ped.state:was_updated("model")) then
 			PedDelete(ped.ped) -- delete ped so a new one can be made with the correct model instead of swapping
-			ped.ped = -1
+			set_ped(ped,-1)
 		end
 		if not PedIsValid(ped.ped) and peds[i][3] < PED_SPAWN_DISTANCE then
 			local x,y,z = unpack(ped.server.pos)
-			ped.ped = PedCreateXYZ(ped.server.model,x,y,z) -- create the closest peds that there is space for
-			if not PedIsValid(ped.ped) then
+			local real = PedCreateXYZ(ped.server.model,x,y,z) -- create the closest peds that there is space for
+			if PedIsValid(real) then
+				set_ped(ped,real)
+				ped.state:apply_changes({},nil,true) -- force a full update
+			else
 				PrintError("failed to create ped")
-				ped.ped = -1
+				set_ped(ped,-1)
 			end
-			ped.state:apply_changes({},nil,true) -- force a full update
 		end
 		ped.created = true
+	end
+end
+function set_ped(ped,real)
+	if ped.ped ~= real then
+		ped.ped = real
+		RunLocalEvent("basync:updatePed",ped)
 	end
 end
 function setup_player(model)
@@ -458,6 +481,7 @@ function update_peds()
 				if ped.ped == gPlayer then
 					player = ped
 				end
+				ped.transition = nil -- can get set by "area" or "vehicle"
 				set_ped_basics(ped)
 				set_ped_area(ped)
 				set_ped_vehicle(ped)
@@ -537,52 +561,7 @@ function set_ped_area(ped)
 	end
 end
 function set_ped_vehicle(ped)
-	if not ped.changecar and ped.state:was_updated("veh_id") then
-		ped.changecar = true
-	end
-	if (ped.changecar or not ped.state:is_owner()) and not ped.transition then
-		local veh = basync.get_vehicle_from_server(ped.server.veh_id)
-		if PedIsInAnyVehicle(ped.ped) then
-			PedWarpOutOfCar(ped.ped)
-		end
-		if veh then
-			if VehicleIsValid(veh.veh) then
-				local seats = VEHICLE_SEATS[VehicleGetModelId(veh.veh)]
-				if not ALLOW_PASSENGERS then
-					for problem in AllPeds() do
-						if PedIsInVehicle(problem,veh.veh) then
-							if not ped.state:is_owner() then
-								seats = nil -- we don't own the ped, so just forget it for now
-								break
-							end
-							PedWarpOutOfCar(problem) -- we own the ped so we need to clear the car NOW
-						end
-					end
-				end
-				if seats then
-					if seats == 0 then
-						PedPutOnBike(ped.ped,veh.veh)
-					elseif ALLOW_PASSENGERS and ped.server.veh_seat >= 0 and ped.server.veh_seat < seats then
-						PedWarpIntoCar(ped.ped,veh.veh,ped.server.veh_seat)
-					else
-						PedWarpIntoCar(ped.ped,veh.veh,0)
-					end
-				end
-				ped.changecar = false
-			elseif ped.ped == gPlayer and not ped.transition then
-				ped.position = {unpack(veh.server.pos)}
-				if AreaGetVisible() == veh.server.area then
-					local pos = ped.position
-					PedSetPosXYZ(ped.ped,pos[1],pos[2],pos[3])
-					PedFaceHeading(ped.ped,pos[4],0)
-				else
-					ped.transition = veh.server.area
-				end
-			end
-		elseif ped.server.veh_id == 0 then
-			ped.changecar = false
-		end
-	end
+	-- TODO
 end
 function set_ped_pos(ped)
 	local pos = ped.position
@@ -620,10 +599,6 @@ RegisterLocalEventHandler("basync:_updateServer",function()
 				state.pos = get_ped_pos(ped)
 				state.area = get_ped_area(ped)
 			end
-			if not ped.changecar then
-				state.veh_id = get_ped_vehicle(ped)
-				state.veh_seat = get_ped_seat(ped)
-			end
 			for k,v in pairs(gModules) do
 				if v.get then
 					local s,m = pcall(v.get,ped)
@@ -651,22 +626,6 @@ function get_ped_area(ped)
 	end
 	return ped.server.area
 end
-function get_ped_vehicle(ped)
-	local vehicle = VehicleFromDriver(ped.ped)
-	if VehicleIsValid(vehicle) and PedIsInVehicle(ped.ped,vehicle) then
-		local veh = basync.get_vehicle_by_vehicle(vehicle)
-		if veh then
-			return veh.id
-		end
-	end
-	return 0
-end
-function get_ped_seat(ped)
-	if ALLOW_PASSENGERS and PedIsInAnyVehicle(ped.ped) and PedMePlaying(ped.ped,"PASSENGER",true) then
-		return 1
-	end
-	return 0
-end
 
 -- ped utility
 function PedSetPosXYZ(ped,x2,y2,z2)
@@ -687,7 +646,7 @@ if not GetConfigBoolean(GetScriptConfig(),"allow_debug",false) then
 end
 
 -- debug menu
-function basync.run_ped_menu()
+function shared.run_ped_menu()
 	local menu = net.menu.create("Basync Peds","Re-open this menu to show new peds.")
 	local peds = {}
 	for _,ped in pairs(gPeds) do
@@ -718,7 +677,7 @@ function basync.run_ped_menu()
 		Wait(0)
 	end
 end
-function basync.spawn_ped_menu()
+function shared.spawn_ped_menu()
 	local menu = net.menu.create("Summon Basync Ped")
 	while menu:active() do
 		for i = 0,258 do
@@ -785,7 +744,7 @@ function specific_ped_menu(id,ped,name)
 				if PedIsValid(ped.ped) then
 					PedDelete(ped.ped)
 				end
-				ped.ped = -1
+				set_ped(ped,-1)
 			end
 		end
 		menu:help("owner: "..tostring(ped.state:is_owner()))

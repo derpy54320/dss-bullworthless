@@ -373,21 +373,25 @@ RegisterLocalEventHandler("ScriptPrinted",function(str,type)
 	end
 end)
 RegisterLocalEventHandler("ControllerUpdating",function(c)
-	if (gTyping or gEscape) and c == 0 and not IsGamePaused() then
-		if gEscape then
-			if not gTyping and not IsKeyPressed("ESCAPE",0) then
-				gEscape = false -- controls stay disabled until escape is released after typing
-				return
+	if (gTyping or gEscape) and not IsGamePaused() then
+		if c == 0 then
+			if gEscape then
+				if not gTyping and not IsKeyPressed("ESCAPE",0) then
+					gEscape = false -- controls stay disabled until escape is released after typing
+					return
+				end
+			elseif IsKeyPressed("ESCAPE",0) then
+				gEscape = true
 			end
-		elseif IsKeyPressed("ESCAPE",0) then
-			gEscape = true
 		end
 		ZeroController(c)
 	end
 end)
 RegisterLocalEventHandler("ControllersUpdated",function()
 	if (gTyping or gEscape) and not IsGamePaused() then
-		ZeroController(0)
+		for c = 0,3 do
+			ZeroController(c)
+		end
 	end
 end)
 

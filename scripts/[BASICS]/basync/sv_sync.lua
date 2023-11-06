@@ -1,5 +1,6 @@
 -- server sync
 basync = GetScriptNetworkTable()
+shared = GetScriptSharedTable(true)
 
 -- globals
 gPlayers = {}
@@ -14,24 +15,24 @@ function basync.is_player_connected(player)
 end
 
 -- network id functions
-function basync.generate_net_id(object)
+function shared.generate_net_id(object)
 	local id = table.getn(gNetIds) + 1
 	gNetIds[id] = object
 	return id
 end
-function basync.ping_net_id(id) -- call after sending the net id to clients to make them respond to the new net id before they can use it
+function shared.ping_net_id(id) -- call after sending the net id to clients to make them respond to the new net id before they can use it
 	for player,unknown in pairs(gPlayers) do
 		SendNetworkEvent(player,"basync:_networkId",id)
 		unknown[id] = true
 	end
 end
-function basync.get_net_id(player,id)
+function shared.get_net_id(player,id)
 	local unknown = gPlayers[player]
 	if unknown and not unknown[id] then
 		return gNetIds[id]
 	end
 end
-function basync.release_net_id(id)
+function shared.release_net_id(id)
 	for _,unknown in pairs(gPlayers) do
 		unknown[id] = nil
 	end

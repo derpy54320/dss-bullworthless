@@ -3,7 +3,7 @@ gPlayers = {}
 RegisterLocalEventHandler("PlayerDropped",function(player)
 	gPlayers[player] = nil
 	for other in pairs(gPlayers) do
-		SendNetworkEvent(other,"playerlist:set",other) -- no name sent, so it clears this player id for clients
+		SendNetworkEvent(other,"playerlist:set",player) -- no name sent, so it clears this player id for clients
 	end
 end)
 RegisterNetworkEventHandler("playerlist:get",function(player)

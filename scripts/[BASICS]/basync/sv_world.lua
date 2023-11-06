@@ -85,7 +85,7 @@ RegisterLocalEventHandler("PlayerDropped",function(player)
 end)
 
 -- main
-function main()
+CreateAdvancedThread("GAME2",function() -- runs post-game so changes from other scripts get sent immediately
 	while true do
 		if gWorld.rate ~= 0 then
 			local h,m = basync.get_time()
@@ -95,7 +95,7 @@ function main()
 		end
 		Wait(1000)
 	end
-end
+end)
 
 -- debug cutoff
 if not GetConfigBoolean(GetScriptConfig(),"allow_debug",false) then

@@ -1,7 +1,7 @@
 -- module utility
 
 local mt_module = {__index = {}}
-local forbid_fields = {_owner=true,type=true,name=true,model=true,pos=true,area=true,veh_id=true,veh_seat=true}
+local forbid_fields = {_owner=true,_vehicle=true,type=true,name=true,model=true,pos=true,area=true}
 local validate_module
 
 -- global
@@ -17,10 +17,14 @@ function create_module(key,value)
 	gModules[key] = setmetatable({value = value},mt_module)
 	return gModules[key]
 end
-function load_modules(prefix,cl,sh,sv)
+function load_modules(prefix,server,index)
 	for name in AllConfigStrings(GetScriptConfig(),"client_file") do
 		if string.find(name,"^modules/"..prefix) then
-			mod_client,mod_shared,mod_server = cl,sh,sv
+			if server then
+				mod_client,mod_shared,mod_server = {},index,index
+			else
+				mod_client,mod_shared,mod_server = index,index,{}
+			end
 			LoadScript(name)
 			module,mod_client,mod_shared,mod_server = nil
 		end

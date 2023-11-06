@@ -1,3 +1,6 @@
+[CONFIG]
+auto_start false
+
 [SCRIPTS]
 client_script cl_main.lua
 client_script cl_models.lua

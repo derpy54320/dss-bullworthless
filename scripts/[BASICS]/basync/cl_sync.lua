@@ -2,9 +2,12 @@
 
 local hz
 
-CreateAdvancedThread("GAME2",function() -- runs after normal game threads so any updates to ped state by other scripts should be caught
+CreateAdvancedThread("GAME2",function() -- runs post-game so changes from other scripts get sent immediately
 	local started
 	local updates = 0
+	if GetConfigBoolean(GetScriptConfig(),"allow_debug") then
+		StartScript("cl_debug.lua")
+	end
 	SendNetworkEvent("basync:_initPlayer")
 	while not SystemIsReady() do
 		Wait(0)

@@ -29,7 +29,7 @@ client_file modules/ped_stats.lua
 client_file modules/ped_target.lua
 client_file modules/ped_throttle.lua
 
-[SYNC_SCRIPTS]
+[MAIN_SCRIPTS]
 main_script sv_sync.lua			# "main" sync scripts
 client_script cl_sync.lua
 main_script sv_world.lua		# world sync
@@ -38,9 +38,8 @@ main_script sv_peds.lua			# ped sync
 client_script cl_peds.lua
 main_script sv_vehicles.lua		# vehicle sync
 client_script cl_vehicles.lua
-
-[DEBUG_SCRIPTS]
-client_script cl_debug.lua		# debug menu for admins
+main_script sv_api.lua			# helpful global server functions (you can remove this script if desired)
+client_file cl_debug.lua		# debug menu for admins (only started if allow_debug is on)
 
 [UTILITY_SCRIPTS]
 client_file utility/debug.lua

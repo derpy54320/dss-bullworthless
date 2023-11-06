@@ -17,7 +17,7 @@ use_profanity_filter 0			# uncomment to use "profanity" scripts to filter chat m
 
 [MISCELLANEOUS]
 should_fade_chat true		# fade the chat during loading screens and respect the player's brightness settings
-log_chat_messages true		# show chat messages sent by players in the server
+log_chat_messages false		# show chat messages sent by players in the server
 display_timeout_ms 7000		# how long it takes for the chat to disappear
 help_command_output "Use /help in the console for a full list of commands. Any console command can be used here, but some may not output here."
 

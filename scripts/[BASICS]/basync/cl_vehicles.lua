@@ -1,5 +1,6 @@
 -- client vehicle sync
 basync = GetScriptNetworkTable()
+shared = GetScriptSharedTable(true)
 LoadScript("utility/debug.lua")
 LoadScript("utility/models.lua")
 LoadScript("utility/modules.lua")
@@ -18,7 +19,7 @@ gUnwanted = {}
 gVisible = {}
 
 -- load modules
-load_modules("veh_",mt_vehicle.__index,mt_vehicle.__index,{})
+load_modules("veh_",false,mt_vehicle.__index)
 
 -- shared api
 function basync.get_vehicle_by_vehicle(veh)
@@ -163,7 +164,7 @@ RegisterNetworkEventHandler("basync:_updateVehicles",function(all_vehicle_change
 end)
 
 -- main / cleanup
-function main()
+CreateAdvancedThread("PRE_GAME",function() -- runs pre-game so updates are applied before other scripts run
 	while not SystemIsReady() do
 		Wait(0)
 	end
@@ -175,7 +176,7 @@ function main()
 		update_vehicles()
 		Wait(0)
 	end
-end
+end)
 function MissionCleanup()
 	for _,veh in pairs(gVehicles) do
 		veh:delete()
@@ -402,7 +403,7 @@ if not GetConfigBoolean(GetScriptConfig(),"allow_debug",false) then
 end
 
 -- debug menu
-function basync.run_vehicle_menu()
+function shared.run_vehicle_menu()
 	local menu = net.menu.create("Basync Vehicles","Re-open this menu to show new vehicles.")
 	local vehs = {}
 	for _,veh in pairs(gVehicles) do
@@ -430,7 +431,7 @@ function basync.run_vehicle_menu()
 		Wait(0)
 	end
 end
-function basync.spawn_vehicle_menu()
+function shared.spawn_vehicle_menu()
 	local menu = net.menu.create("Spawn Basync Vehicle")
 	while menu:active() do
 		for i = 272,298 do

@@ -1,16 +1,12 @@
 -- client debug menu stuff
-if not GetConfigBoolean(GetScriptConfig(),"allow_debug",false) then
-	TerminateCurrentScript()
-	return
-end
-basync = GetScriptNetworkTable()
+shared = GetScriptSharedTable(true)
 
 local gDebugText = {active = {},funcs = {},order = {"position","peds","send"}}
 local gDebugPanel
 local gDebugString
 
 -- shared
-function basync.draw_debug_string(str)
+function shared.draw_debug_string(str)
 	if gDebugString and IsThreadRunning(gDebugString) then
 		TerminateThread(gDebugString)
 	end
@@ -29,16 +25,16 @@ function M_Debug()
 	local menu = net.menu.create("Basync Debug")
 	while menu:active() do
 		if menu:option("Ped Viewer") then
-			basync.run_ped_menu()
+			shared.run_ped_menu()
 		elseif menu:option("Summon Ped") then
-			basync.spawn_ped_menu()
+			shared.spawn_ped_menu()
 		elseif menu:option("Vehicle Viewer") then
-			basync.run_vehicle_menu()
+			shared.run_vehicle_menu()
 		elseif menu:option("Spawn Vehicle") then
-			basync.spawn_vehicle_menu()
+			shared.spawn_vehicle_menu()
 		elseif menu:option("World Settings") then
-			if basync.is_world_ready() then
-				basync.run_world_menu()
+			if shared.is_world_ready() then
+				shared.run_world_menu()
 			else
 				menu:alert("World is not ready.",3)
 			end

@@ -1,5 +1,6 @@
 -- client world sync
 basync = GetScriptNetworkTable()
+shared = GetScriptSharedTable(true)
 
 -- world state
 gStarted = 0
@@ -72,7 +73,7 @@ function MissionSetup()
 end
 
 -- main
-function main()
+CreateAdvancedThread("PRE_GAME",function() -- runs pre-game so updates are applied before other scripts run
 	while AreaIsLoading() do
 		Wait(0)
 	end
@@ -97,7 +98,7 @@ function main()
 		end
 		Wait(0)
 	end
-end
+end)
 
 -- debug cutoff
 if not GetConfigBoolean(GetScriptConfig(),"allow_debug",false) then
@@ -105,7 +106,7 @@ if not GetConfigBoolean(GetScriptConfig(),"allow_debug",false) then
 end
 
 -- debug menu
-function basync.run_world_menu()
+function shared.run_world_menu()
 	local menu = net.menu.create("Basync World")
 	while menu:active() do
 		if menu:option("Set Chapter","["..(gWorld.chapter+1).."]") then
