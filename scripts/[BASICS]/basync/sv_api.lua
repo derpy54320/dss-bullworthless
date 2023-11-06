@@ -161,16 +161,32 @@ function _G.PedPutOnBike(ped,veh)
 		ped:warp_into_vehicle(ped,veh)
 	end)
 end
-function _G.PedWarpIntoCar(ped,veh)
+function _G.PedWarpIntoCar(ped,veh,seat)
 	return run(function()
-		ped:warp_into_vehicle(ped,veh)
+		ped:warp_into_vehicle(ped,veh,seat)
 	end)
 end
-function _G.PedWarpOutOfCar(ped,veh)
+function _G.PedWarpOutOfCar()
 	return run(function()
-		ped:warp_into_vehicle(ped,veh)
+		ped:warp_out_of_vehicle()
 	end)
 end
+
+-- peds [actions]
+
+-- peds [ai]
+
+-- peds [flag]
+
+-- peds [punishment]
+
+-- peds [speech]
+
+-- peds [stats]
+
+-- peds [target]
+
+-- peds [throttle]
 
 -- vehicles [core]
 function _G.AllVehicles() -- iterator (for loops)

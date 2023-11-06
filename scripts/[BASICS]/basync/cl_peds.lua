@@ -104,9 +104,11 @@ function create_ped(id)
 		ped = -1, -- the ped is *ONLY* created when the ped has state
 		created = false, -- if the ped *should* exist
 		deleted = false, -- if the ped was deleted while owned (makes the ped unable to be created again)
-		position = {0,0,0,0}, -- smooth position {x,y,z,h}
 		netbasics = false, -- if the stuff in "set_ped_basics" was applied
+		position = {0,0,0,0}, -- smooth position {x,y,z,h}
 		-- .transition is set when the ped is transitioning areas (only gPlayer)
+		-- .vehicle is set when the ped is in a vehicle
+		seat = 0,
 	},mt_ped)
 end
 function validate_ped(ped,level)
@@ -186,7 +188,7 @@ RegisterNetworkEventHandler("basync:_undeletePed",function(id)
 	end
 	ped.deleted = false -- server didn't delete the ped, so we'll unmark them
 end)
-RegisterNetworkEventHandler("basync:_setPedVehicle",function(id,vid,seat)
+RegisterNetworkEventHandler("basync:_setVehicle",function(id,vid,seat)
 	local ped = gPeds[id]
 	if not ped then
 		error("ped #"..id.." doesn't exist")
@@ -485,7 +487,9 @@ function update_peds()
 				set_ped_basics(ped)
 				set_ped_area(ped)
 				set_ped_vehicle(ped)
-				set_ped_pos(ped)
+				if not ped.transition then
+					set_ped_pos(ped)
+				end
 				for k,v in pairs(gModules) do
 					if v.set then
 						local s,m = pcall(v.set,ped,ped.server[k])
@@ -552,21 +556,36 @@ function set_ped_area(ped)
 	if ped.ped == gPlayer and ped.state:was_updated("area") then
 		ped.position = {unpack(ped.server.pos)}
 		if AreaGetVisible() == ped.server.area then
-			local pos = ped.position
-			PedSetPosXYZ(ped.ped,pos[1],pos[2],pos[3])
-			PedFaceHeading(ped.ped,pos[4],0)
+			local x,y,z,h = unpack(ped.position)
+			PedSetPosXYZ(ped.ped,x,y,z)
+			PedFaceHeading(ped.ped,h,0)
 		else
 			ped.transition = ped.server.area
 		end
 	end
 end
 function set_ped_vehicle(ped)
-	-- TODO
+	if not ped.state:is_owner() or ped.state:was_updated("_vehicle") then
+		local veh = ped.vehicle
+		if ped.ped == gPlayer then
+			if veh and not VehicleIsValid(veh.veh) then
+				ped.position = {unpack(veh.server.pos)}
+				if AreaGetVisible() == veh.server.area then
+					local x,y,z,h = unpack(veh.position)
+					PedSetPosXYZ(ped.ped,x,y,z)
+					PedFaceHeading(ped.ped,h,0)
+				else
+					ped.transition = veh.server.area
+				end
+			end
+		end
+		update_ped_vehicle(ped,veh)
+	end
 end
 function set_ped_pos(ped)
 	local pos = ped.position
 	local updated = ped.state:was_updated("pos")
-	if (updated or not ped.state:is_owner()) and not ped.transition and not PedIsInAnyVehicle(ped.ped) then
+	if (updated or not ped.state:is_owner()) and not PedIsInAnyVehicle(ped.ped) then
 		local x1,y1,z1,h1 = unpack(pos)
 		local x2,y2,z2,h2 = unpack(ped.server.pos)
 		if not updated then
@@ -596,8 +615,16 @@ RegisterLocalEventHandler("basync:_updateServer",function()
 			local state = {}
 			state.model = PedGetModelId(ped.ped)
 			if not ped.transition then
-				state.pos = get_ped_pos(ped)
+				local veh,seat = get_ped_vehicle(ped)
+				if veh ~= ped.vehicle then
+					if veh then
+						SendNetworkEvent("basync:_setVehicle",id,veh.id,seat)
+					else
+						SendNetworkEvent("basync:_setVehicle",id)
+					end
+				end
 				state.area = get_ped_area(ped)
+				state.pos = get_ped_pos(ped)
 			end
 			for k,v in pairs(gModules) do
 				if v.get then
@@ -616,9 +643,15 @@ RegisterLocalEventHandler("basync:_updateServer",function()
 		SendNetworkEvent("basync:_updatePeds",all_changes)
 	end
 end)
-function get_ped_pos(ped)
-	local x,y,z = PedGetPosXYZ(ped.ped)
-	return {x,y,z,math.deg(PedGetHeading(ped.ped))}
+function get_ped_vehicle(ped)
+	local veh = PedGetLastVehicle(ped.ped)
+	if VehicleIsValid(veh) and PedIsInVehicle(ped.ped,veh) then
+		for other in basync.all_vehicles() do
+			if other.veh == veh then
+				return other,0
+			end
+		end
+	end
 end
 function get_ped_area(ped)
 	if PedGetFlag(ped.ped,184) then
@@ -626,8 +659,12 @@ function get_ped_area(ped)
 	end
 	return ped.server.area
 end
+function get_ped_pos(ped)
+	local x,y,z = PedGetPosXYZ(ped.ped)
+	return {x,y,z,math.deg(PedGetHeading(ped.ped))}
+end
 
--- ped utility
+-- ped positioning
 function PedSetPosXYZ(ped,x2,y2,z2)
 	if ped == gPlayer then
 		local x1,y1,z1 = PedGetPosXYZ(ped)
@@ -638,6 +675,46 @@ function PedSetPosXYZ(ped,x2,y2,z2)
 		return _G.PlayerSetPosXYZ(x2,y2,z2)
 	end
 	return _G.PedSetPosSimple(ped,x2,y2,z2)
+end
+
+-- ped vehicles
+function update_ped_vehicle(ped,veh)
+	local last = PedGetLastVehicle(ped.ped)
+	if VehicleIsValid(last) and PedIsInVehicle(ped.ped,last) then
+		if veh and last == veh.veh then
+			return -- already in the right vehicle
+		end
+		PedWarpOutOfCar(ped.ped) -- get out of the wrong vehicle
+	end
+	if veh and VehicleIsValid(veh.veh) then
+		local count = VEHICLE_SEATS[VehicleGetModelId(veh.veh)]
+		if count then
+			local seats = {}
+			for other in AllPeds() do
+				if PedIsInVehicle(other,veh.veh) then
+					PedWarpOutOfCar(other) -- get everyone out so we can just re-do all seating
+				end
+			end
+			if ALLOW_PASSENGERS and count > 1 then
+				for _,other in pairs(gPeds) do
+					if other.vehicle == veh and other.seat < count then
+						seats[other.seat] = other -- passengers are allowed so assign seats
+					end
+				end
+			else
+				seats[0] = ped -- no passengers allowed so just use this ped
+			end
+			for seat,other in pairs(seats) do
+				if PedIsValid(other.ped) then
+					if count == 0 then
+						PedPutOnBike(other.ped,veh.veh) -- 0 seats means it is a bike
+					else
+						PedWarpIntoCar(other.ped,veh.veh,seat) -- otherwise it is a car
+					end
+				end
+			end
+		end
+	end
 end
 
 -- debug cutoff
@@ -702,7 +779,7 @@ function specific_ped_menu(id,ped,name)
 			local backup_2 = ped.node_t
 			ped.server = nil
 			ped.node_t = nil
-			basync.draw_debug_string("gPeds["..id.."] = "..get_debug_string(ped))
+			shared.draw_debug_string("gPeds["..id.."] = "..get_debug_string(ped))
 			ped.server = backup_1
 			ped.node_t = backup_2
 		elseif menu:option("Teleport To Ped") and not AreaIsLoading() then
@@ -764,7 +841,7 @@ end
 -- debug events
 RegisterNetworkEventHandler("basync:_debugPed",function(str)
 	if str then
-		basync.draw_debug_string(str)
+		shared.draw_debug_string(str)
 	else
 		PrintWarning("Failed to show server data because the network id wasn't a valid ped.")
 	end

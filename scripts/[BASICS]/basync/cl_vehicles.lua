@@ -454,7 +454,7 @@ function specific_vehicle_menu(id,veh,name)
 		elseif menu:option("Show Full Client Data") then
 			local backup = veh.server
 			veh.server = nil
-			basync.draw_debug_string("gVehicles["..id.."] = "..get_debug_string(veh))
+			shared.draw_debug_string("gVehicles["..id.."] = "..get_debug_string(veh))
 			veh.server = backup
 		elseif menu:option("Teleport To Vehicle") and not AreaIsLoading() then
 			if veh.state then
@@ -491,7 +491,7 @@ end
 -- debug events
 RegisterNetworkEventHandler("basync:_debugVehicle",function(str)
 	if str then
-		basync.draw_debug_string(str)
+		shared.draw_debug_string(str)
 	else
 		PrintWarning("Failed to show server data because the network id wasn't a valid vehicle.")
 	end

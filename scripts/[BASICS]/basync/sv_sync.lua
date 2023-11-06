@@ -2,6 +2,8 @@
 basync = GetScriptNetworkTable()
 shared = GetScriptSharedTable(true)
 
+-- TODO: re-design the net id system to not need a player argument when de-referencing
+
 -- globals
 gPlayers = {}
 gNetIds = {}

@@ -84,6 +84,12 @@ function mt_vehicle:__tostring()
 end
 function mt_vehicle.__index:delete()
 	validate_vehicle(self,2)
+	for _,ped in pairs(self.seats) do
+		if ped.vehicle == self then
+			ped.vehicle = nil
+			shared.update_ped_vehicle(nil,ped)
+		end
+	end
 	for p in pairs(gPlayers) do
 		SendNetworkEvent(p,"basync:_deleteVehicle",self.id)
 	end
@@ -132,16 +138,10 @@ function mt_vehicle.__index:get_seat(seat)
 	validate_vehicle(self,2)
 	if seat == nil then
 		seat = 0
-	elseif (not ALLOW_PASSENGERS and seat ~= 0) or math.floor(seat) ~= seat or seat < 0 then
+	elseif (not ALLOW_PASSENGERS and seat ~= 0) or type(seat) ~= "number" or math.floor(seat) ~= seat or seat < 0 then
 		error("invalid seat",2)
 	end
-	if self.seats[seat] then
-		local ped = self.seats[seat]
-		if basync.is_ped_valid(ped) then
-			return ped
-		end
-		self.seats[seat] = nil
-	end
+	return self.seats[seat]
 end
 function mt_vehicle.__index:set_owner(player) -- return false if it can't set the owner to that player yet
 	validate_vehicle(self,2)
@@ -193,7 +193,7 @@ function mt_vehicle.__index:set_seat(seat,ped)
 	validate_vehicle(self,2)
 	if seat == nil then
 		seat = 0
-	elseif (not ALLOW_PASSENGERS and seat ~= 0) or math.floor(seat) ~= seat or seat < 0 then
+	elseif (not ALLOW_PASSENGERS and seat ~= 0) or type(seat) ~= "number" or math.floor(seat) ~= seat or seat < 0 then
 		error("invalid seat",2)
 	end
 	if ped == nil then
@@ -207,9 +207,9 @@ function mt_vehicle.__index:set_seat(seat,ped)
 		if not basync.is_ped_valid(ped) then
 			error("invalid ped",2)
 		elseif self.seats[seat] then
-			error("seat is already occupied",2)
+			error("seat already occupied",2)
 		elseif ped.vehicle then
-			error("ped is already in a vehicle",2)
+			error("ped already in a vehicle",2)
 		end
 		self.seats[seat] = ped
 		ped.vehicle = self

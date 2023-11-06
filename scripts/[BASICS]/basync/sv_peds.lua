@@ -159,12 +159,7 @@ function mt_ped.__index:get_position()
 end
 function mt_ped.__index:get_vehicle()
 	validate_ped(self,2)
-	if self.vehicle then
-		if self.vehicle:is_valid() then
-			return self.vehicle
-		end
-		self.vehicle = nil
-	end
+	return self.vehicle
 end
 function mt_ped.__index:set_owner(player) -- return false if it can't set the owner to that player yet
 	validate_ped(self,2)
@@ -218,11 +213,13 @@ function mt_ped.__index:warp_into_vehicle(veh,seat)
 	validate_ped(self,2)
 	if seat == nil then
 		seat = 0
-	elseif (not ALLOW_PASSENGERS and seat ~= 0) or math.floor(seat) ~= seat or seat < 0 then
+	elseif (not ALLOW_PASSENGERS and seat ~= 0) or type(seat) ~= "number" or math.floor(seat) ~= seat or seat < 0 then
 		error("invalid seat",2)
 	end
 	if not basync.is_vehicle_valid(veh) then
 		error("invalid vehicle",2)
+	elseif veh.seats[seat] and veh.seats[seat] ~= self then
+		error("seat already occupied",2)
 	end
 	if self.vehicle then
 		if self.vehicle.seats[self.seat] ~= self then
@@ -230,7 +227,7 @@ function mt_ped.__index:warp_into_vehicle(veh,seat)
 		end
 		self.vehicle:set_seat(self.seat,nil)
 	end
-	self.vehicle:set_seat(seat,self)
+	veh:set_seat(seat,self)
 end
 function mt_ped.__index:warp_out_of_vehicle()
 	validate_ped(self,2)
@@ -246,12 +243,12 @@ end
 function shared.update_ped_vehicle(players,ped)
 	local veh = ped.vehicle
 	for p in pairs(players or gPlayers) do
-		ped.state:update_field("_vehicle") -- there isn't any _vehicle field in ped, but the update state is still used
 		if veh then
-			SendNetworkEvent(p,"basync:_setPedVehicle",ped.id,veh.id,ped.seat)
+			SendNetworkEvent(p,"basync:_setVehicle",ped.id,veh.id,ped.seat)
 		else
-			SendNetworkEvent(p,"basync:_setPedVehicle",ped.id)
+			SendNetworkEvent(p,"basync:_setVehicle",ped.id)
 		end
+		ped.state:update_field("_vehicle") -- there isn't any _vehicle field in ped, but the update state is still used
 	end
 end
 
@@ -306,6 +303,24 @@ RegisterNetworkEventHandler("basync:_deletePed",function(player,id)
 			ped:delete()
 		else
 			SendNetworkEvent(player,"basync:_undeletePed",id)
+		end
+	end
+end)
+RegisterNetworkEventHandler("basync:_setVehicle",function(player,id,vid,seat)
+	if gPlayers[player] then
+		local ped = shared.get_net_id(player,id)
+		if ped and ped == gPeds[id] and not ped.state.updating._vehicle then
+			local veh = basync.get_vehicle_from_player(player,vid)
+			if veh and (not ALLOW_PASSENGERS and seat ~= 0) or type(seat) ~= "number" or math.floor(seat) ~= seat or seat < 0 then
+				return (kick_bad_args(player))
+			end
+			if veh and (not veh.seats[seat] or veh.seats[seat] == ped) then
+				ped:warp_into_vehicle(veh,seat)
+			else
+				ped:warp_out_of_vehicle()
+			end
+			ped.state:update_field("_vehicle")
+			RunLocalEvent("basync:updatePed",ped)
 		end
 	end
 end)
