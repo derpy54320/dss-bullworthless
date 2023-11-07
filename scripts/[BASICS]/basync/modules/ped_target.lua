@@ -35,8 +35,8 @@ end)
 function mod_shared:get_target()
 	validate_ped(self,2)
 	if self.server.target then
-		local ped = basync.get_ped_from_player(self.state.owner,self.server.target)
-		if ped then
+		local ped = shared.get_net_id(self.server.target)
+		if ped and ped == gPeds[ped.id] then
 			return ped
 		end
 	end

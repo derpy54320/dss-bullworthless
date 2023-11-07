@@ -107,6 +107,7 @@ function create_ped(id)
 		netbasics = false, -- if the stuff in "set_ped_basics" was applied
 		position = {0,0,0,0}, -- smooth position {x,y,z,h}
 		-- .transition is set when the ped is transitioning areas (only gPlayer)
+		changecar = false,
 		-- .vehicle is set when the ped is in a vehicle
 		seat = 0,
 	},mt_ped)
@@ -565,19 +566,20 @@ function set_ped_area(ped)
 	end
 end
 function set_ped_vehicle(ped)
-	if not ped.state:is_owner() or ped.state:was_updated("_vehicle") then
+	if ped.changecar or not ped.state:is_owner() or ped.state:was_updated("_vehicle") then
 		local veh = ped.vehicle
-		if ped.ped == gPlayer then
-			if veh and not VehicleIsValid(veh.veh) then
-				ped.position = {unpack(veh.server.pos)}
-				if AreaGetVisible() == veh.server.area then
-					local x,y,z,h = unpack(veh.position)
-					PedSetPosXYZ(ped.ped,x,y,z)
-					PedFaceHeading(ped.ped,h,0)
-				else
-					ped.transition = veh.server.area
-				end
+		if ped.ped == gPlayer and veh and not VehicleIsValid(veh.veh) then
+			ped.position = {unpack(veh.server.pos)}
+			if AreaGetVisible() == veh.server.area then
+				local x,y,z,h = unpack(veh.position)
+				PedSetPosXYZ(ped.ped,x,y,z)
+				PedFaceHeading(ped.ped,h,0)
+			else
+				ped.transition = veh.server.area
 			end
+			ped.changecar = true
+		else
+			ped.changecar = false
 		end
 		update_ped_vehicle(ped,veh)
 	end
@@ -615,12 +617,14 @@ RegisterLocalEventHandler("basync:_updateServer",function()
 			local state = {}
 			state.model = PedGetModelId(ped.ped)
 			if not ped.transition then
-				local veh,seat = get_ped_vehicle(ped)
-				if veh ~= ped.vehicle then
-					if veh then
-						SendNetworkEvent("basync:_setVehicle",id,veh.id,seat)
-					else
-						SendNetworkEvent("basync:_setVehicle",id)
+				if not ped.changecar then
+					local veh,seat = get_ped_vehicle(ped)
+					if veh ~= ped.vehicle then
+						if veh then
+							SendNetworkEvent("basync:_setVehicle",id,veh.id,seat)
+						else
+							SendNetworkEvent("basync:_setVehicle",id)
+						end
 					end
 				end
 				state.area = get_ped_area(ped)

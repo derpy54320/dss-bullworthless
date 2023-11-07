@@ -13,7 +13,7 @@ ALLOW_PASSENGERS = GetConfigBoolean(GetScriptConfig(),"allow_passengers",false)
 
 -- globals
 mt_ped = {__index = {}}
-gPlayers = {}
+gPlayers = {} -- generally good enough for validity checking, but some functions must still check in case they are called during a drop event
 gPeds = {}
 
 -- load modules
@@ -23,16 +23,16 @@ load_modules("ped_",true,mt_ped.__index)
 function basync.is_ped_valid(ped)
 	return type(ped) == "table" and getmetatable(ped) == mt_ped and gPeds[ped.id] == ped
 end
-function basync.get_player_ped(player)
-	local data = gPlayers[player]
-	if data and data.ped:is_valid() then
-		return data.ped
-	end
-end
-function basync.get_ped_from_player(player,id)
-	local ped = shared.get_net_id(player,id)
+function basync.get_ped_from_player(id)
+	local ped = shared.get_net_id(id)
 	if ped and ped == gPeds[id] then
 		return ped
+	end
+end
+function basync.get_player_ped(player)
+	local data = gPlayers[player]
+	if data and data.ped:is_valid() and IsPlayerValid(player) then
+		return data.ped
 	end
 end
 function basync.all_player_peds() -- for player,ped in basync.all_player_peds() do
@@ -40,7 +40,7 @@ function basync.all_player_peds() -- for player,ped in basync.all_player_peds() 
 	return function()
 		player,data = next(gPlayers,player)
 		while player do
-			if data.ped:is_valid() then
+			if data.ped:is_valid() and IsPlayerValid(player) then
 				return player,data.ped
 			end
 			player,data = next(gPlayers,player)
@@ -80,10 +80,11 @@ function basync.create_ped(model)
 		end
 		ped.id = shared.generate_net_id(ped)
 		for p in pairs(gPlayers) do
-			SendNetworkEvent(p,"basync:_createPed",ped.id)
-			ped.state:require_update(p)
+			if IsPlayerValid(p) then
+				SendNetworkEvent(p,"basync:_createPed",ped.id)
+				ped.state:require_update(p)
+			end
 		end
-		shared.ping_net_id(ped.id)
 		gPeds[ped.id] = ped
 		add_cleanup_object(GetCurrentScript(),ped)
 		RunLocalEvent("basync:createPed",ped)
@@ -108,7 +109,9 @@ function mt_ped.__index:delete()
 		self.vehicle:set_seat(self.seat,nil)
 	end
 	for p in pairs(gPlayers) do
-		SendNetworkEvent(p,"basync:_deletePed",self.id)
+		if IsPlayerValid(p) then
+			SendNetworkEvent(p,"basync:_deletePed",self.id)
+		end
 	end
 	shared.release_net_id(self.id)
 	gPeds[self.id] = nil
@@ -139,7 +142,10 @@ function mt_ped.__index:get_id()
 end
 function mt_ped.__index:get_owner()
 	validate_ped(self,2)
-	return self.state.owner
+	if IsPlayerValid(self.state.owner) then
+		return self.state.owner
+	end
+	return -1
 end
 function mt_ped.__index:get_name()
 	validate_ped(self,2)
@@ -164,7 +170,7 @@ end
 function mt_ped.__index:set_owner(player) -- return false if it can't set the owner to that player yet
 	validate_ped(self,2)
 	if player ~= -1 and not gPlayers[player] then
-		if IsPlayerValid(player) then
+		if type(player) == "number" and IsPlayerValid(player) then
 			return false
 		end
 		error("invalid player",2)
@@ -213,7 +219,9 @@ function mt_ped.__index:warp_into_vehicle(veh,seat)
 	validate_ped(self,2)
 	if seat == nil then
 		seat = 0
-	elseif (not ALLOW_PASSENGERS and seat ~= 0) or type(seat) ~= "number" or math.floor(seat) ~= seat or seat < 0 then
+	elseif not ALLOW_PASSENGERS and seat ~= 0 then
+		return false
+	elseif type(seat) ~= "number" or math.floor(seat) ~= seat or seat < 0 then
 		error("invalid seat",2)
 	end
 	if not basync.is_vehicle_valid(veh) then
@@ -221,13 +229,11 @@ function mt_ped.__index:warp_into_vehicle(veh,seat)
 	elseif veh.seats[seat] and veh.seats[seat] ~= self then
 		error("seat already occupied",2)
 	end
-	if self.vehicle then
-		if self.vehicle.seats[self.seat] ~= self then
-			error("failed to warp out of vehicle",2) -- should never actually happen
-		end
-		self.vehicle:set_seat(self.seat,nil)
+	if self.vehicle and (self.vehicle.seats[self.seat] ~= self or not self.vehicle:set_seat(self.seat,nil)) then
+		error("failed to warp out of vehicle",2) -- should never actually happen
 	end
 	veh:set_seat(seat,self)
+	return true
 end
 function mt_ped.__index:warp_out_of_vehicle()
 	validate_ped(self,2)
@@ -240,16 +246,18 @@ function mt_ped.__index:warp_out_of_vehicle()
 end
 
 -- ped utility
-function shared.update_ped_vehicle(players,ped)
+function shared.update_ped_vehicle(ped)
 	local veh = ped.vehicle
-	for p in pairs(players or gPlayers) do
-		if veh then
-			SendNetworkEvent(p,"basync:_setVehicle",ped.id,veh.id,ped.seat)
-		else
-			SendNetworkEvent(p,"basync:_setVehicle",ped.id)
+	for p in pairs(gPlayers) do
+		if IsPlayerValid(p) then
+			if veh then
+				SendNetworkEvent(p,"basync:_setVehicle",ped.id,veh.id,ped.seat)
+			else
+				SendNetworkEvent(p,"basync:_setVehicle",ped.id)
+			end
 		end
-		ped.state:update_field("_vehicle") -- there isn't any _vehicle field in ped, but the update state is still used
 	end
+	ped.state:update_field("_vehicle") -- there isn't any _vehicle field in ped, but the update state is still used
 end
 
 -- player connection events
@@ -260,7 +268,7 @@ RegisterLocalEventHandler("basync:_initPlayer",function(player)
 	gPlayers[player] = create_player(player)
 	for id,ped in pairs(gPeds) do
 		SendNetworkEvent(player,"basync:_createPed",id)
-		shared.update_ped_vehicle({[player]=true},ped)
+		shared.update_ped_vehicle(ped)
 		ped.state:require_update(player)
 	end
 end)
@@ -298,7 +306,7 @@ end
 -- player ped events
 RegisterNetworkEventHandler("basync:_deletePed",function(player,id)
 	if gPlayers[player] then
-		local ped = shared.get_net_id(player,id)
+		local ped = shared.get_net_id(id)
 		if ped and ped == gPeds[id] and ped.state.owner == player and RunLocalEvent("basync:deletePed",ped) then
 			ped:delete()
 		else
@@ -308,10 +316,10 @@ RegisterNetworkEventHandler("basync:_deletePed",function(player,id)
 end)
 RegisterNetworkEventHandler("basync:_setVehicle",function(player,id,vid,seat)
 	if gPlayers[player] then
-		local ped = shared.get_net_id(player,id)
+		local ped = shared.get_net_id(id)
 		if ped and ped == gPeds[id] and not ped.state.updating._vehicle then
-			local veh = basync.get_vehicle_from_player(player,vid)
-			if veh and (not ALLOW_PASSENGERS and seat ~= 0) or type(seat) ~= "number" or math.floor(seat) ~= seat or seat < 0 then
+			local veh = basync.get_vehicle_from_player(vid)
+			if veh and ((not ALLOW_PASSENGERS and seat ~= 0) or type(seat) ~= "number" or math.floor(seat) ~= seat or seat < 0) then
 				return (kick_bad_args(player))
 			end
 			if veh and (not veh.seats[seat] or veh.seats[seat] == ped) then
@@ -331,7 +339,7 @@ RegisterNetworkEventHandler("basync:_updatePeds",function(player,all_changes)
 		return (kick_bad_args(player))
 	end
 	for id,changes in pairs(all_changes) do
-		local ped = shared.get_net_id(player,id)
+		local ped = shared.get_net_id(id)
 		if ped and ped == gPeds[id] then
 			if type(changes) ~= "table" then
 				return (kick_bad_args(player))
@@ -353,7 +361,7 @@ RegisterNetworkEventHandler("basync:_updatedPeds",function(player,all_updates)
 		return (kick_bad_args(player))
 	end
 	for id,updates in pairs(all_updates) do
-		local ped = shared.get_net_id(player,id)
+		local ped = shared.get_net_id(id)
 		if ped and ped == gPeds[id] then
 			if type(updates) ~= "table" then
 				return (kick_bad_args(player))
@@ -377,7 +385,7 @@ RegisterNetworkEventHandler("basync:_visiblePeds",function(player,ids)
 		data.visible = ids -- not guaranteed to be valid IDs or even numbers (so it should only be checked against valid ones)
 		for _,id in ipairs(before) do
 			if not has_value(ids,id) then
-				local ped = shared.get_net_id(player,id)
+				local ped = shared.get_net_id(id)
 				if ped and ped == gPeds[id] then
 					lost_visibility(player,ped)
 				end
@@ -385,7 +393,7 @@ RegisterNetworkEventHandler("basync:_visiblePeds",function(player,ids)
 		end
 		for _,id in ipairs(ids) do
 			if not has_value(before,id) then
-				local ped = shared.get_net_id(player,id)
+				local ped = shared.get_net_id(id)
 				if ped and ped == gPeds[id] then
 					gain_visibility(player,ped)
 				end
@@ -566,7 +574,7 @@ end
 -- debug events
 RegisterNetworkEventHandler("basync:_debugPed",function(player,id)
 	if gPlayers[player] and net.admin.is_player_admin(player) then
-		local ped = shared.get_net_id(player,id)
+		local ped = shared.get_net_id(id)
 		if ped and ped == gPeds[id] then
 			local backup = ped.server
 			ped.server = nil

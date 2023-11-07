@@ -23,14 +23,17 @@ function basync.get_weather()
 	return 0
 end
 function basync.get_time()
-	if gWorld.rate ~= 0 then
-		local m = math.floor(gWorld.hour * 60 + gWorld.minute + (GetTimer() - gStarted) / gWorld.rate)
-		if m < 0 then
-			return 0,0
+	if next(gWorld) then
+		if gWorld.rate ~= 0 then
+			local m = math.floor(gWorld.hour * 60 + gWorld.minute + (GetTimer() - gStarted) / gWorld.rate)
+			if m < 0 then
+				return 0,0
+			end
+			return math.mod(math.floor(m/60),24),math.mod(m,60)
 		end
-		return math.mod(math.floor(m/60),24),math.mod(m,60)
+		return gWorld.hour,gWorld.minute
 	end
-	return gWorld.hour,gWorld.minute
+	return 0,0
 end
 function basync.get_time_rate()
 	if next(gWorld) then

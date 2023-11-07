@@ -1,4 +1,5 @@
 -- client debug menu stuff
+basync = GetScriptNetworkTable()
 shared = GetScriptSharedTable(true)
 
 local gDebugText = {active = {},funcs = {},order = {"position","peds","send"}}
@@ -33,7 +34,7 @@ function M_Debug()
 		elseif menu:option("Spawn Vehicle") then
 			shared.spawn_vehicle_menu()
 		elseif menu:option("World Settings") then
-			if shared.is_world_ready() then
+			if basync.is_world_ready() then
 				shared.run_world_menu()
 			else
 				menu:alert("World is not ready.",3)

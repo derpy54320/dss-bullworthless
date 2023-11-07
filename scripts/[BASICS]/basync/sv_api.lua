@@ -158,12 +158,12 @@ function _G.PedFaceHeading(ped,h) -- degrees, just like the client version
 end
 function _G.PedPutOnBike(ped,veh)
 	return run(function()
-		ped:warp_into_vehicle(ped,veh)
+		ped:warp_into_vehicle(veh)
 	end)
 end
 function _G.PedWarpIntoCar(ped,veh,seat)
 	return run(function()
-		ped:warp_into_vehicle(ped,veh,seat)
+		ped:warp_into_vehicle(veh,seat)
 	end)
 end
 function _G.PedWarpOutOfCar()

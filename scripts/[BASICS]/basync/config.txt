@@ -7,17 +7,17 @@ require_name basync
 [FEATURES]
 allow_debug true			# allow admins to use the basync debug menu
 force_player_ai true		# give the player ped player ai (disable this if you have another script that should control ai)
-allow_passengers false		# use experimental passenger support (can cause issues on the client)
+allow_passengers true		# allow vehicle seats other than the driver seat to be used
 
 [PREFERENCES]
 slide_time_ms 150
 ped_stop_alt_method true		# limit the population instead of using StopPedProduction (needed if you use a script that relies on PedFindRandomSpawnPosition)
 ped_pool_target 21				# if there are over 20 peds when a ped is created (not including the newly created ped), a single ambient ped will be deleted instantly
-ped_spawn_distance 50
-ped_despawn_distance 60
+ped_spawn_distance 55
+ped_despawn_distance 65
 vehicle_pool_target 10			# the normal limit is 15
-vehicle_spawn_distance 50
-vehicle_despawn_distance 60
+vehicle_spawn_distance 75
+vehicle_despawn_distance 85
 
 [SYNC_MODULES]
 client_file modules/ped_actions.lua		# all client_files starting with "modules/" are loaded as sync modules

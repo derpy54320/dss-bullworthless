@@ -2,46 +2,56 @@
 basync = GetScriptNetworkTable()
 shared = GetScriptSharedTable(true)
 
--- TODO: re-design the net id system to not need a player argument when de-referencing
-
 -- globals
-gPlayers = {}
-gNetIds = {}
+gPlayers = {} -- players have a list of net ids they need to tell us they deleted before we can re-use the id
+gNetIds = {} -- 0 is an invalid id
 
--- player check
+-- shared api
 function basync.is_player_connected(player)
-	if gPlayers[player] then
+	if gPlayers[player] and IsPlayerValid(player) then
 		return true
 	end
 	return false
 end
 
--- network id functions
+-- network ids
 function shared.generate_net_id(object)
-	local id = table.getn(gNetIds) + 1
+	local id = 1
+	while gNetIds[id] or is_id_busy(id) do
+		id = id + 1
+	end
 	gNetIds[id] = object
 	return id
 end
-function shared.ping_net_id(id) -- call after sending the net id to clients to make them respond to the new net id before they can use it
-	for player,unknown in pairs(gPlayers) do
-		SendNetworkEvent(player,"basync:_networkId",id)
-		unknown[id] = true
+function shared.release_net_id(id) -- the id INSTANTLY becomes unsafe to use on the server
+	if gNetIds[id] then
+		for player,waiting in pairs(gPlayers) do
+			if IsPlayerValid(player) then -- net id can be released in a drop event so we check
+				SendNetworkEvent(player,"basync:_networkId",id)
+				waiting[id] = true
+			end
+		end
+		gNetIds[id] = nil
 	end
 end
-function shared.get_net_id(player,id)
-	local unknown = gPlayers[player]
-	if unknown and not unknown[id] then
-		return gNetIds[id]
-	end
+function shared.get_net_id(id)
+	return gNetIds[id]
 end
-function shared.release_net_id(id)
-	for _,unknown in pairs(gPlayers) do
-		unknown[id] = nil
+function is_id_busy(id)
+	for _,waiting in pairs(gPlayers) do
+		if waiting[id] then
+			return true
+		end
 	end
-	gNetIds[id] = nil
+	return false
 end
 
--- player network events
+-- player events
+RegisterLocalEventHandler("PlayerDropped",function(player)
+	if gPlayers[player] then
+		gPlayers[player] = nil
+	end
+end)
 RegisterNetworkEventHandler("basync:_initPlayer",function(player)
 	gPlayers[player] = {}
 	SendNetworkEvent(player,"basync:_setRate",GetServerHz())
@@ -49,9 +59,9 @@ RegisterNetworkEventHandler("basync:_initPlayer",function(player)
 	RunLocalEvent("basync:initPlayer",player)
 end)
 RegisterNetworkEventHandler("basync:_networkId",function(player,id)
-	local unknown = gPlayers[player]
-	if unknown then
-		unknown[id] = nil
+	local waiting = gPlayers[player]
+	if waiting then
+		waiting[id] = nil
 	end
 end)
 RegisterNetworkEventHandler("basync:_kickMe",function(player,reason)
@@ -60,10 +70,5 @@ RegisterNetworkEventHandler("basync:_kickMe",function(player,reason)
 			return KickPlayer(player,"your script misbehaved ("..reason..")")
 		end
 		return KickPlayer(player,"your script misbehaved (?)")
-	end
-end)
-RegisterLocalEventHandler("PlayerDropped",function(player)
-	if gPlayers[player] then
-		gPlayers[player] = nil
 	end
 end)

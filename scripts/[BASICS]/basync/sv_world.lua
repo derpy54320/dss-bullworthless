@@ -7,8 +7,8 @@ gPlayers = {}
 gWorld = {
 	chapter = 0,
 	weather = 0,
-	hour = 16,
-	minute = 30,
+	hour = 8,
+	minute = 0,
 	rate = 1000, -- ms per minute (or 0 for frozen time)
 }
 
@@ -70,8 +70,10 @@ function update_world(player)
 		SendNetworkEvent(player,"basync:_updateWorld",world)
 		return
 	end
-	for player in pairs(gPlayers) do
-		SendNetworkEvent(player,"basync:_updateWorld",world)
+	for p in pairs(gPlayers) do
+		if IsPlayerValid(p) then
+			SendNetworkEvent(p,"basync:_updateWorld",world)
+		end
 	end
 end
 
@@ -89,8 +91,8 @@ CreateAdvancedThread("GAME2",function() -- runs post-game so changes from other 
 	while true do
 		if gWorld.rate ~= 0 then
 			local h,m = basync.get_time()
-			for player in pairs(gPlayers) do
-				SendNetworkEvent(player,"basync:_updateTime",h,m)
+			for p in pairs(gPlayers) do
+				SendNetworkEvent(p,"basync:_updateTime",h,m)
 			end
 		end
 		Wait(1000)

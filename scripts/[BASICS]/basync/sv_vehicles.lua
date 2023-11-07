@@ -23,8 +23,8 @@ load_modules("veh_",true,mt_vehicle.__index)
 function basync.is_vehicle_valid(veh)
 	return type(veh) == "table" and getmetatable(veh) == mt_vehicle and gVehicles[veh.id] == veh
 end
-function basync.get_vehicle_from_player(player,id)
-	local veh = shared.get_net_id(player,id)
+function basync.get_vehicle_from_player(id)
+	local veh = shared.get_net_id(id)
 	if veh and veh == gVehicles[id] then
 		return veh
 	end
@@ -60,10 +60,11 @@ function basync.create_vehicle(model)
 		end
 		veh.id = shared.generate_net_id(veh)
 		for p in pairs(gPlayers) do
-			SendNetworkEvent(p,"basync:_createVehicle",veh.id)
-			veh.state:require_update(p)
+			if IsPlayerValid(p) then
+				SendNetworkEvent(p,"basync:_createVehicle",veh.id)
+				veh.state:require_update(p)
+			end
 		end
-		shared.ping_net_id(veh.id)
 		gVehicles[veh.id] = veh
 		add_cleanup_object(GetCurrentScript(),veh)
 		RunLocalEvent("basync:createVehicle",veh)
@@ -87,11 +88,13 @@ function mt_vehicle.__index:delete()
 	for _,ped in pairs(self.seats) do
 		if ped.vehicle == self then
 			ped.vehicle = nil
-			shared.update_ped_vehicle(nil,ped)
+			shared.update_ped_vehicle(ped)
 		end
 	end
 	for p in pairs(gPlayers) do
-		SendNetworkEvent(p,"basync:_deleteVehicle",self.id)
+		if IsPlayerValid(p) then
+			SendNetworkEvent(p,"basync:_deleteVehicle",self.id)
+		end
 	end
 	shared.release_net_id(self.id)
 	gVehicles[self.id] = nil
@@ -116,7 +119,10 @@ function mt_vehicle.__index:get_id()
 end
 function mt_vehicle.__index:get_owner()
 	validate_vehicle(self,2)
-	return self.state.owner
+	if IsPlayerValid(self.state.owner) then
+		return self.state.owner
+	end
+	return -1
 end
 function mt_vehicle.__index:get_name()
 	validate_vehicle(self,2)
@@ -138,7 +144,7 @@ function mt_vehicle.__index:get_seat(seat)
 	validate_vehicle(self,2)
 	if seat == nil then
 		seat = 0
-	elseif (not ALLOW_PASSENGERS and seat ~= 0) or type(seat) ~= "number" or math.floor(seat) ~= seat or seat < 0 then
+	elseif type(seat) ~= "number" or math.floor(seat) ~= seat or seat < 0 then
 		error("invalid seat",2)
 	end
 	return self.seats[seat]
@@ -146,7 +152,7 @@ end
 function mt_vehicle.__index:set_owner(player) -- return false if it can't set the owner to that player yet
 	validate_vehicle(self,2)
 	if player ~= -1 and not gPlayers[player] then
-		if IsPlayerValid(player) then
+		if type(player) == "number" and IsPlayerValid(player) then
 			return false
 		end
 		error("invalid player",2)
@@ -193,7 +199,9 @@ function mt_vehicle.__index:set_seat(seat,ped)
 	validate_vehicle(self,2)
 	if seat == nil then
 		seat = 0
-	elseif (not ALLOW_PASSENGERS and seat ~= 0) or type(seat) ~= "number" or math.floor(seat) ~= seat or seat < 0 then
+	elseif not ALLOW_PASSENGERS and seat ~= 0 then
+		return false
+	elseif type(seat) ~= "number" or math.floor(seat) ~= seat or seat < 0 then
 		error("invalid seat",2)
 	end
 	if ped == nil then
@@ -201,7 +209,7 @@ function mt_vehicle.__index:set_seat(seat,ped)
 		if ped then
 			self.seats[seat] = nil
 			ped.vehicle = nil
-			shared.update_ped_vehicle(nil,ped)
+			shared.update_ped_vehicle(ped)
 		end
 	elseif self.seats[seat] ~= ped then
 		if not basync.is_ped_valid(ped) then
@@ -212,13 +220,18 @@ function mt_vehicle.__index:set_seat(seat,ped)
 			error("ped already in a vehicle",2)
 		end
 		self.seats[seat] = ped
+		ped.server.pos = {unpack(self.server.pos)}
+		ped.server.area = self.server.area
 		ped.vehicle = self
 		ped.seat = seat
-		shared.update_ped_vehicle(nil,ped)
+		ped.state:update_field("pos")
+		ped.state:update_field("area")
+		shared.update_ped_vehicle(ped)
 	end
 	if self.auto_owner then
 		set_best_owner(self)
 	end
+	return true
 end
 
 -- player connection events
@@ -253,7 +266,7 @@ end
 -- player vehicle events
 RegisterNetworkEventHandler("basync:_deleteVehicle",function(player,id)
 	if gPlayers[player] then
-		local veh = shared.get_net_id(player,id)
+		local veh = shared.get_net_id(id)
 		if veh and veh == gVehicles[id] and veh.state.owner == player and RunLocalEvent("basync:deleteVehicle") then
 			veh:delete()
 		else
@@ -268,7 +281,7 @@ RegisterNetworkEventHandler("basync:_updateVehicles",function(player,all_changes
 		return (kick_bad_args(player))
 	end
 	for id,changes in pairs(all_changes) do
-		local veh = shared.get_net_id(player,id)
+		local veh = shared.get_net_id(id)
 		if veh and veh == gVehicles[id] then
 			if type(changes) ~= "table" then
 				return (kick_bad_args(player))
@@ -290,7 +303,7 @@ RegisterNetworkEventHandler("basync:_updatedVehicles",function(player,all_update
 		return (kick_bad_args(player))
 	end
 	for id,updates in pairs(all_updates) do
-		local veh = shared.get_net_id(player,id)
+		local veh = shared.get_net_id(id)
 		if veh and veh == gVehicles[id] then
 			if type(updates) ~= "table" then
 				return (kick_bad_args(player))
@@ -314,7 +327,7 @@ RegisterNetworkEventHandler("basync:_visibleVehicles",function(player,ids)
 		data.visible = ids -- not guaranteed to be valid IDs or even numbers (so it should only be checked against valid ones)
 		for _,id in ipairs(before) do
 			if not has_value(ids,id) then
-				local veh = shared.get_net_id(player,id)
+				local veh = shared.get_net_id(id)
 				if veh and veh == gVehicles[id] then
 					lost_visibility(player,veh)
 				end
@@ -322,7 +335,7 @@ RegisterNetworkEventHandler("basync:_visibleVehicles",function(player,ids)
 		end
 		for _,id in ipairs(ids) do
 			if not has_value(before,id) then
-				local veh = shared.get_net_id(player,id)
+				local veh = shared.get_net_id(id)
 				if veh and veh == gVehicles[id] then
 					gain_visibility(player,veh)
 				end
@@ -520,7 +533,7 @@ end
 -- debug events
 RegisterNetworkEventHandler("basync:_debugVehicle",function(player,id)
 	if gPlayers[player] and net.admin.is_player_admin(player) then
-		local veh = shared.get_net_id(player,id)
+		local veh = shared.get_net_id(id)
 		if veh and veh == gVehicles[id] then
 			local backup = veh.server
 			veh.server = nil
