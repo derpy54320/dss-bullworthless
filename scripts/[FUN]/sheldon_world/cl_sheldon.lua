@@ -134,7 +134,7 @@ end
 
 CreateThread(function()
 	local alpha = 0
-	while true do
+	while false do
 		local hidden = true
 		for ped in AllPeds() do
 			if PedIsInCombat(ped) and PedGetTargetPed(ped) == gPlayer then
