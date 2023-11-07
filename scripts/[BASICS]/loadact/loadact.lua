@@ -1,6 +1,7 @@
--- loads all action trees with a DEFAULT_KEY node
-
 gActionTrees = {
+	-- extra trees for Bullworthless
+	"NPC_AMBIENT.ACT",
+	-- all action trees with DEFAULT_KEY
 	"1_02B.ACT",
 	"1_03_DAVIS.ACT",
 	"3_05_NORTON.ACT",
