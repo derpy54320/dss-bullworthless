@@ -1,7 +1,7 @@
 local gVehicle
 
 function main()
-	gVehicle = VehicleCreateXYZ(291,193.604,5.811,5.452,-166.9)
+	gVehicle = VehicleCreateXYZ(math.random(272,298),193.604,5.811,5.452,-166.9)
 	ClockSet(9,0)
 end
 RegisterNetworkEventHandler("the_car:hit_button",function(player)
