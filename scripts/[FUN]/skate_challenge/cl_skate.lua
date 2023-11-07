@@ -220,23 +220,21 @@ RegisterNetworkEventHandler("skate:finishPlayer",function(id,score)
 end)
 
 -- keyboard
-RegisterLocalEventHandler("ControllersUpdated",function(c)
-	if c == 0 and not IsUsingJoystick(c) then
+RegisterLocalEventHandler("ControllersUpdated",function()
+	if not IsUsingJoystick(0) then
 		local x,y = 0,0
-		--[[
-		if IsKeyPressed("W",c) then
+		if IsKeyPressed("W",0) then
 			y = y + 1
 		end
-		if IsKeyPressed("A",c) then
+		if IsKeyPressed("A",0) then
 			x = x - 1
 		end
-		if IsKeyPressed("S",c) then
+		if IsKeyPressed("S",0) then
 			y = y - 1
 		end
-		if IsKeyPressed("D",c) then
+		if IsKeyPressed("D",0) then
 			x = x + 1
 		end
-		]]
 		SetStickValue(c,16,x)
 		SetStickValue(c,17,y)
 	end
