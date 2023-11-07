@@ -9,6 +9,7 @@ LoadScript("utility/state.lua")
 
 -- TODO: fix PedWarpOutOfCar with bikes
 -- TODO: check seat on server too
+-- TODO: delete all peds on cleanup
 
 -- config
 SYNC_ENTITIES = string.lower(GetConfigString(GetScriptConfig(),"sync_entities","off"))
