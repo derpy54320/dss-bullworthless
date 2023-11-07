@@ -24,7 +24,7 @@ function main()
 end
 function F_IsAnyoneNearby()
 	local x,y,z = PlayerGetPosXYZ()
-	local peds = {PedFindInAreaXYZ(x,y,z,3)}
+	local peds = {PedFindInAreaXYZ(x,y,z,2)}
 	local index = 2
 	while peds[index] do
 		if peds[index] ~= gPlayer then
