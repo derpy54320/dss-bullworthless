@@ -1,15 +1,6 @@
 RegisterLocalEventHandler("menu:openMain",function(add)
-	add("Reset Camera","Reset the camera if it broke.",F_Camera)
 	add("Swap Model","Swap your player model.",M_Model)
 end)
-function F_Camera()
-	CameraAllowChange(true)
-	CameraAllowScriptedChange(true)
-	CameraReset()
-	CameraDefaultFOV()
-	CameraReturnToPlayer()
-	CameraFade(0,1)
-end
 function M_Model()
 	local menu = net.menu.create("Swap Model")
 	while menu:active() do

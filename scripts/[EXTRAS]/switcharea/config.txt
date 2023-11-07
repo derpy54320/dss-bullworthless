@@ -1,2 +1,3 @@
 client_script cl_areas.lua
 require_dependency admin
+require_dependency menu
