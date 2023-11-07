@@ -84,7 +84,7 @@ end
 
 -- main
 CreateAdvancedThread("PRE_GAME",function() -- runs pre-game so updates are applied before other scripts run
-	if SYNC_WORLD then
+	if not SYNC_WORLD then
 		return
 	end
 	while AreaIsLoading() do
