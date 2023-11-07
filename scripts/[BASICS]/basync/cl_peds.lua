@@ -7,6 +7,8 @@ LoadScript("utility/modules.lua")
 LoadScript("utility/nodes.lur")
 LoadScript("utility/state.lua")
 
+-- TODO: fix PedWarpOutOfCar with bikes
+
 -- config
 ALT_PED_STOP_METHOD = GetConfigBoolean(GetScriptConfig(),"ped_stop_alt_method",false)
 FORCE_PLAYER_AI = GetConfigBoolean(GetScriptConfig(),"force_player_ai",false)
