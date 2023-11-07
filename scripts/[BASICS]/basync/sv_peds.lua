@@ -65,7 +65,7 @@ function basync.create_ped(model)
 			type = "normal", -- "normal" peds are just normal, "player" peds use gPlayer when owned
 			name = model_name,
 			model = model,
-			pos = {273,-73,7,90}, -- x, y, z, h (degrees)
+			pos = {273,-73,6,90}, -- x, y, z, h (degrees)
 			area = 0, -- only guaranteed to be a number, not a valid area
 		}
 		local ped = setmetatable({
@@ -285,7 +285,7 @@ end)
 
 -- player state
 function create_player(player)
-	local zone,x,y,z = 0,273,-73,7 -- school grounds (default spawn)
+	local zone,x,y,z = 0,273,-73,6 -- school grounds (default spawn)
 	local dist,h = math.random(0,500)/100,math.rad(math.random(0,359))
 	local ped = basync.create_ped(math.random(3,48))
 	ped.auto_owner = false
