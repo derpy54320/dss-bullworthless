@@ -1,3 +1,4 @@
 auto_start false
+require_dependency basync
 main_script sv_car.lua
 client_script cl_car.lua

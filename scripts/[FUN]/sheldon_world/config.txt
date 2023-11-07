@@ -12,7 +12,7 @@ spawn_burst 10
 show_debug_counter false
 
 [CONFIG]
-require_verson 8
+auto_start false
 require_dependency basync
 main_script sv_sheldon.lua
 client_script cl_sheldon.lua
