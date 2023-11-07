@@ -3,6 +3,7 @@ basync = GetScriptNetworkTable()
 
 -- config
 SYNC_WORLD = GetConfigBoolean(GetScriptConfig(),"sync_world",false)
+PASS_OUT = GetConfigBoolean(GetScriptConfig(),"control_passout",false)
 
 -- globals
 gStarted = GetTimer()
@@ -10,8 +11,8 @@ gPlayers = {}
 gWorld = {
 	chapter = 0,
 	weather = 0,
-	hour = 8,
-	minute = 0,
+	hour = 1,
+	minute = 55,
 	rate = 1000, -- ms per minute (or 0 for frozen time)
 }
 
@@ -112,6 +113,9 @@ CreateAdvancedThread("GAME2",function() -- runs post-game so changes from other 
 	while true do
 		if gWorld.rate ~= 0 then
 			local h,m = basync.get_time()
+			if PASS_OUT and update_passout(h,m) then
+				h,m = basync.get_time()
+			end
 			for p in pairs(gPlayers) do
 				SendNetworkEvent(p,"basync:_updateTime",h,m)
 			end
@@ -119,6 +123,18 @@ CreateAdvancedThread("GAME2",function() -- runs post-game so changes from other 
 		Wait(1000)
 	end
 end)
+function update_passout(h,m)
+	if h >= 2 and h < 8 then
+		for p in pairs(gPlayers) do
+			SendNetworkEvent(p,"basync:_allowPassout")
+		end
+		gWorld.hour = 8
+		gWorld.minute = 0
+		gStarted = GetTimer()
+		return true -- time changed
+	end
+	return false
+end
 
 -- debug cutoff
 if not GetConfigBoolean(GetScriptConfig(),"debugging",false) then

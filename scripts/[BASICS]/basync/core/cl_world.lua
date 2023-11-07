@@ -4,8 +4,10 @@ shared = GetScriptSharedTable(true)
 
 -- config
 SYNC_WORLD = GetConfigBoolean(GetScriptConfig(),"sync_world",false)
+PASS_OUT = GetConfigBoolean(GetScriptConfig(),"control_passout",false)
 
 -- globals
+gPassout = false
 gStarted = 0
 gWorld = {}
 
@@ -46,6 +48,11 @@ function basync.get_time_rate()
 end
 
 -- network events
+RegisterNetworkEventHandler("basync:_allowPassout",function()
+	if PASS_OUT then
+		gPassout = true
+	end
+end)
 RegisterNetworkEventHandler("basync:_updateWorld",function(world)
 	if SYNC_WORLD then
 		for i,k in pairs({"chapter","weather","rate","hour","minute"}) do
@@ -72,9 +79,7 @@ function MissionSetup()
 			Wait(0)
 		end
 		function MissionCleanup()
-			if not AreaIsLoading() then
-				ChapterSet(chapter)
-			end
+			ChapterSet(chapter)
 			WeatherSet(weather)
 			ClockSet(hour,minute)
 			ClockSetTickRate(60)
@@ -95,7 +100,6 @@ CreateAdvancedThread("PRE_GAME",function() -- runs pre-game so updates are appli
 	end
 	ChapterSet(gWorld.chapter)
 	WeatherSet(gWorld.weather)
-	ClockSetTickRate(1)
 	while true do
 		local h,m = basync.get_time()
 		local hour,minute = ClockGet()
@@ -105,10 +109,27 @@ CreateAdvancedThread("PRE_GAME",function() -- runs pre-game so updates are appli
 		if WeatherGet() ~= gWorld.weather then
 			WeatherSet(gWorld.weather)
 		end
-		if hour ~= h or minue ~= m then
+		if gPassout then
+			if hour < 2 then
+				ClockSet(2,0)
+			elseif hour >= 8 then
+				ClockSet(7,59)
+			end
+			ClockSetTickRate(60)
+			Wait(3000) -- some time to let the node start
+			while PedIsPlaying(gPlayer,"/G/PLAYER/DEFAULT_KEY/LOCOMOTION",true) and PedMePlaying(gPlayer,"EXHAUSTED_COLLAPSE",true) do
+				Wait(0)
+			end
+			gPassout = false
+		elseif PASS_OUT and h >= 2 and h < 8 then
+			ClockSet(1,59)
+		elseif hour ~= h or minue ~= m then
 			ClockSet(h,m)
-			ClockSetTickRate(1)
 		end
+		if PASS_OUT and (h < 1 or h >= 8) and PlayerGetPhysicalState() ~= 0 then
+			PlayerChangePhysicalState(0)
+		end
+		ClockSetTickRate(1)
 		Wait(0)
 	end
 end)
