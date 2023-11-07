@@ -1,0 +1,3 @@
+auto_start false
+main_script sv_car.lua
+client_script cl_car.lua

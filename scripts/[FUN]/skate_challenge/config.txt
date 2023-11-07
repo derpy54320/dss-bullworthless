@@ -1,0 +1,4 @@
+auto_start false
+main_script sv_skate.lua
+client_script cl_skate.lua
+client_file rolling.png
