@@ -110,7 +110,7 @@ function get_time(ms)
 	return m..":"..math.mod(s,60)
 end
 function should_fail()
-	return PedGetWeapon(gPlayer) ~= 437 or not PedIsPlaying(gPlayer,"/G/VEHICLES/SKATEBOARD/LOCOMOTION/RIDE/COAST",true)--or PedIsPlaying(gPlayer,"/G/VEHICLES/SKATEBOARD/LOCOMOTION/RIDE/CHARGEJUMP",true))
+	return PedGetWeapon(gPlayer) ~= 437 or not (PedIsPlaying(gPlayer,"/G/VEHICLES/SKATEBOARD/LOCOMOTION/RIDE/BRAKE",true) or PedIsPlaying(gPlayer,"/G/VEHICLES/SKATEBOARD/LOCOMOTION/RIDE/COAST",true))
 end
 function update_speed()
 	local x1,y1,z1 = unpack(gLast)
