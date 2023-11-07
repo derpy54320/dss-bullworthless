@@ -24,7 +24,7 @@ module:check_func(function(value)
 	return value > 0
 end)
 module:get_func(function(ped)
-	return PedGetMaxHealth(ped.ped)
+	return math.max(1,PedGetMaxHealth(ped.ped))
 end)
 module:set_func(function(ped,value)
 	if not ped.state:is_owner() or ped.state:was_updated("maxhp") then
@@ -54,7 +54,7 @@ module:check_func(function(value)
 	return value >= 0
 end)
 module:get_func(function(ped)
-	return GameGetPedStat(ped.ped,20)
+	return math.max(0,GameGetPedStat(ped.ped,20))
 end)
 module:set_func(function(ped,value)
 	if not ped.state:is_owner() or ped.state:was_updated("speed") then
