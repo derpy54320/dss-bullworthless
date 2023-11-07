@@ -7,6 +7,7 @@ LoadScript("utility/modules.lua")
 LoadScript("utility/state.lua")
 
 -- config
+SYNC_ENTITIES = string.lower(GetConfigString(GetScriptConfig(),"sync_entities","off"))
 SLIDE_TIME_SECS = GetConfigNumber(GetScriptConfig(),"slide_time_ms",0) / 1000
 VEH_POOL_TARGET = GetConfigNumber(GetScriptConfig(),"vehicle_pool_target",0)
 VEH_SPAWN_DISTANCE = GetConfigNumber(GetScriptConfig(),"vehicle_spawn_distance",0) ^ 2
@@ -165,12 +166,17 @@ end)
 
 -- main / cleanup
 CreateAdvancedThread("PRE_GAME",function() -- runs pre-game so updates are applied before other scripts run
+	if SYNC_ENTITIES == "off" then
+		return
+	end
 	while not SystemIsReady() do
 		Wait(0)
 	end
 	AreaClearAllVehicles()
 	while true do
-		hide_vehicles()
+		if SYNC_ENTITIES == "full" then
+			hide_vehicles()
+		end
 		validate_vehicles()
 		update_visible()
 		update_vehicles()

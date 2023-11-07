@@ -2,7 +2,10 @@
 basync = GetScriptNetworkTable()
 shared = GetScriptSharedTable(true)
 
--- world state
+-- config
+SYNC_WORLD = GetConfigBoolean(GetScriptConfig(),"sync_world",false)
+
+-- globals
 gStarted = 0
 gWorld = {}
 
@@ -44,10 +47,12 @@ end
 
 -- network events
 RegisterNetworkEventHandler("basync:_updateWorld",function(world)
-	for i,k in pairs({"chapter","weather","rate","hour","minute"}) do
-		gWorld[k] = world[i]
+	if SYNC_WORLD then
+		for i,k in pairs({"chapter","weather","rate","hour","minute"}) do
+			gWorld[k] = world[i]
+		end
+		gStarted = GetTimer()
 	end
-	gStarted = GetTimer()
 end)
 RegisterNetworkEventHandler("basync:_updateTime",function(hour,minute)
 	if next(gWorld) then
@@ -59,24 +64,29 @@ end)
 
 -- setup / cleanup
 function MissionSetup()
-	local chapter = ChapterGet()
-	local weather = WeatherGet()
-	local hour,minute = ClockGet()
-	while not SystemIsReady() do
-		Wait(0)
-	end
-	function MissionCleanup()
-		if not AreaIsLoading() then
-			ChapterSet(chapter)
+	if SYNC_WORLD then
+		local chapter = ChapterGet()
+		local weather = WeatherGet()
+		local hour,minute = ClockGet()
+		while not SystemIsReady() do
+			Wait(0)
 		end
-		WeatherSet(weather)
-		ClockSet(hour,minute)
-		ClockSetTickRate(60)
+		function MissionCleanup()
+			if not AreaIsLoading() then
+				ChapterSet(chapter)
+			end
+			WeatherSet(weather)
+			ClockSet(hour,minute)
+			ClockSetTickRate(60)
+		end
 	end
 end
 
 -- main
 CreateAdvancedThread("PRE_GAME",function() -- runs pre-game so updates are applied before other scripts run
+	if SYNC_WORLD then
+		return
+	end
 	while AreaIsLoading() do
 		Wait(0)
 	end

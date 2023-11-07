@@ -2,6 +2,11 @@
 basync = GetScriptNetworkTable()
 shared = GetScriptSharedTable(true)
 
+-- config
+SYNC_WORLD = GetConfigBoolean(GetScriptConfig(),"sync_world",false)
+SYNC_ENTITIES = string.lower(GetConfigString(GetScriptConfig(),"sync_entities","off"))
+
+-- state
 local gDebugText = {active = {},funcs = {},order = {"position","peds","send"}}
 local gDebugPanel
 local gDebugString

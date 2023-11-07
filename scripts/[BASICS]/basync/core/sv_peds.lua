@@ -8,8 +8,9 @@ LoadScript("utility/modules.lua")
 LoadScript("utility/state.lua")
 
 -- config
-REASSIGN_DIST = 1
+SYNC_ENTITIES = string.lower(GetConfigString(GetScriptConfig(),"sync_entities","off"))
 ALLOW_PASSENGERS = GetConfigBoolean(GetScriptConfig(),"allow_passengers",false)
+REASSIGN_DIST = 1
 
 -- globals
 mt_ped = {__index = {}}
@@ -60,7 +61,9 @@ end
 -- ped objects
 function basync.create_ped(model)
 	local model_name = PED_MODELS[model]
-	if model_name then
+	if SYNC_ENTITIES ~= "full" then
+		error("entity sync is not enabled",3)
+	elseif model_name then
 		local server = {
 			type = "normal", -- "normal" peds are just normal, "player" peds use gPlayer when owned
 			name = model_name,
@@ -265,7 +268,13 @@ RegisterLocalEventHandler("basync:_initPlayer",function(player)
 	if gPlayers[player] then
 		destroy_player(player,gPlayers[player])
 	end
-	gPlayers[player] = create_player(player)
+	if SYNC_ENTITIES == "partial" then
+		SYNC_ENTITIES = "full"
+		gPlayers[player] = create_player(player)
+		SYNC_ENTITIES = "partial"
+	elseif SYNC_ENTITIES == "full" then
+		gPlayers[player] = create_player(player)
+	end
 	for id,ped in pairs(gPeds) do
 		SendNetworkEvent(player,"basync:_createPed",id)
 		shared.update_ped_vehicle(ped)
@@ -490,6 +499,9 @@ end
 
 -- main
 CreateAdvancedThread("GAME2",function() -- runs post-game so changes from other scripts get sent immediately
+	if SYNC_ENTITIES == "off" then
+		return
+	end
 	while true do
 		assign_owners()
 		send_updates()

@@ -5,16 +5,20 @@ require_version 8
 require_name basync
 
 [FEATURES]
+sync_world true			# "false" to not sync the world or "true" to sync things like weather and time
+sync_entities partial		# "off" to not sync, "full" to sync everything, or "partial" to only sync player peds and leave local entities alone
+
+[OPTIONS]
 allow_debug true			# allow admins to use the basync debug menu
 force_player_ai true		# give the player ped player ai (disable this if you have another script that should control ai)
 allow_passengers true		# allow vehicle seats other than the driver seat to be used
 
 [PREFERENCES]
 slide_time_ms 150
-ped_stop_alt_method true		# limit the population instead of using StopPedProduction (needed if you use a script that relies on PedFindRandomSpawnPosition)
 ped_pool_target 21				# if there are over 20 peds when a ped is created (not including the newly created ped), a single ambient ped will be deleted instantly
 ped_spawn_distance 55
 ped_despawn_distance 65
+ped_stop_alt_method true		# limit the population instead of using StopPedProduction (needed if you use a script that relies on PedFindRandomSpawnPosition)
 vehicle_pool_target 10			# the normal limit is 15
 vehicle_spawn_distance 75
 vehicle_despawn_distance 85
@@ -29,17 +33,17 @@ client_file modules/ped_stats.lua
 client_file modules/ped_target.lua
 client_file modules/ped_throttle.lua
 
-[MAIN_SCRIPTS]
-main_script sv_sync.lua			# "main" sync scripts
-client_script cl_sync.lua
-main_script sv_world.lua		# world sync
-client_script cl_world.lua
-main_script sv_peds.lua			# ped sync
-client_script cl_peds.lua
-main_script sv_vehicles.lua		# vehicle sync
-client_script cl_vehicles.lua
-main_script sv_api.lua			# helpful global server functions (you can remove this script if desired)
-client_file cl_debug.lua		# debug menu for admins (only started if allow_debug is on)
+[CORE_SCRIPTS]
+main_script core/sv_sync.lua			# "main" sync scripts
+client_script core/cl_sync.lua
+main_script core/sv_world.lua			# world sync
+client_script core/cl_world.lua
+main_script core/sv_peds.lua			# ped sync
+client_script core/cl_peds.lua
+main_script core/sv_vehicles.lua		# vehicle sync
+client_script core/cl_vehicles.lua
+main_script core/sv_api.lua				# helpful global server functions (you can remove this script if desired)
+client_file core/cl_debug.lua			# debug menu for admins (only started if allow_debug is on)
 
 [UTILITY_SCRIPTS]
 client_file utility/debug.lua

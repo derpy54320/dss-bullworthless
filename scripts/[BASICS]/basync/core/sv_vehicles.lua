@@ -8,8 +8,9 @@ LoadScript("utility/modules.lua")
 LoadScript("utility/state.lua")
 
 -- config
-REASSIGN_DIST = 5
+SYNC_ENTITIES = string.lower(GetConfigString(GetScriptConfig(),"sync_entities","off"))
 ALLOW_PASSENGERS = GetConfigBoolean(GetScriptConfig(),"allow_passengers",false)
+REASSIGN_DIST = 5
 
 -- globals
 mt_vehicle = {__index = {}}
@@ -42,7 +43,9 @@ end
 -- vehicle objects
 function basync.create_vehicle(model)
 	local model_name = VEHICLE_MODELS[model]
-	if model_name then
+	if SYNC_ENTITIES ~= "full" then
+		error("entity sync is not enabled",3)
+	elseif model_name then
 		local server = {
 			name = model_name,
 			model = model,
@@ -449,6 +452,9 @@ end
 
 -- main
 CreateAdvancedThread("GAME2",function() -- runs post-game so changes from other scripts get sent immediately
+	if SYNC_ENTITIES == "off" then
+		return
+	end
 	while true do
 		assign_owners()
 		send_updates()

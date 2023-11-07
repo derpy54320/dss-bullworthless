@@ -2,6 +2,13 @@
 basync = GetScriptNetworkTable()
 shared = GetScriptSharedTable(true)
 
+-- config
+SYNC_ENTITIES = string.lower(GetConfigString(GetScriptConfig(),"sync_entities","off"))
+if SYNC_ENTITIES ~= "off" and SYNC_ENTITIES ~= "full" and SYNC_ENTITIES ~= "partial" then
+	PrintError("bad config: sync_entities = \""..SYNC_ENTITIES.."\" (expected \"off\", \"full\", or \"partial\")")
+	error(nil)
+end
+
 -- globals
 gPlayers = {} -- players have a list of net ids they need to tell us they deleted before we can re-use the id
 gNetIds = {} -- 0 is an invalid id

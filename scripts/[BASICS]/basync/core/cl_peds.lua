@@ -10,13 +10,14 @@ LoadScript("utility/state.lua")
 -- TODO: fix PedWarpOutOfCar with bikes
 
 -- config
-ALT_PED_STOP_METHOD = GetConfigBoolean(GetScriptConfig(),"ped_stop_alt_method",false)
-FORCE_PLAYER_AI = GetConfigBoolean(GetScriptConfig(),"force_player_ai",false)
+SYNC_ENTITIES = string.lower(GetConfigString(GetScriptConfig(),"sync_entities","off"))
 SLIDE_TIME_SECS = GetConfigNumber(GetScriptConfig(),"slide_time_ms",0) / 1000
 PED_POOL_TARGET = GetConfigNumber(GetScriptConfig(),"ped_pool_target",0)
 PED_SPAWN_DISTANCE = GetConfigNumber(GetScriptConfig(),"ped_spawn_distance",0) ^ 2
 PED_DESPAWN_DISTANCE = GetConfigNumber(GetScriptConfig(),"ped_despawn_distance",0) ^ 2
+ALT_PED_STOP_METHOD = GetConfigBoolean(GetScriptConfig(),"ped_stop_alt_method",false)
 ALLOW_PASSENGERS = GetConfigBoolean(GetScriptConfig(),"allow_passengers",false)
+FORCE_PLAYER_AI = GetConfigBoolean(GetScriptConfig(),"force_player_ai",false)
 
 -- data
 AUTHORITY_MODELS = {[49]=1,[50]=1,[51]=1,[52]=1,[53]=1,[83]=1,[97]=1,[158]=1,[234]=0,[238]=1}
@@ -258,21 +259,26 @@ end)
 
 -- main / cleanup
 CreateAdvancedThread("PRE_GAME",function() -- runs pre-game so updates are applied before other scripts run
+	if SYNC_ENTITIES == "off" then
+		return
+	end
 	while not SystemIsReady() do
 		Wait(0)
 	end
 	gPlayerWarning = GetTimer()
 	AreaClearAllPeds()
 	while true do
-		if ALT_PED_STOP_METHOD then
-			for m in pairs(AUTHORITY_MODELS) do
-				PedSetUniqueModelStatus(m,-1)
+		if SYNC_ENTITIES == "full" then
+			if ALT_PED_STOP_METHOD then
+				for m in pairs(AUTHORITY_MODELS) do
+					PedSetUniqueModelStatus(m,-1)
+				end
+				AreaOverridePopulation(0)
+			else
+				StopPedProduction(true)
 			end
-			AreaOverridePopulation(0)
-		else
-			StopPedProduction(true)
+			hide_peds()
 		end
-		hide_peds()
 		validate_peds()
 		update_player()
 		update_visible()
@@ -291,19 +297,21 @@ function MissionCleanup()
 			PedDelete(ped.ped)
 		end
 	end
-	if ALT_PED_STOP_METHOD then
-		for m,s in pairs(AUTHORITY_MODELS) do
-			PedSetUniqueModelStatus(m,s)
+	if SYNC_ENTITIES ~= "off" then
+		if ALT_PED_STOP_METHOD then
+			for m,s in pairs(AUTHORITY_MODELS) do
+				PedSetUniqueModelStatus(m,s)
+			end
+			AreaRevertToDefaultPopulation()
+		else
+			StopPedProduction(false)
 		end
-		AreaRevertToDefaultPopulation()
-	else
-		StopPedProduction(false)
+		PlayerSwapModel("player")
+		PedSetActionTree(gPlayer,"","")
+		PedSetAITree(gPlayer,"/Global/PlayerAI","Act/PlayerAI.act")
+		AreaDisableCameraControlForTransition(false)
+		CameraFade(0,1)
 	end
-	PlayerSwapModel("player")
-	PedSetActionTree(gPlayer,"","")
-	PedSetAITree(gPlayer,"/Global/PlayerAI","Act/PlayerAI.act")
-	AreaDisableCameraControlForTransition(false)
-	CameraFade(0,1)
 end
 
 -- hide unwanted peds
