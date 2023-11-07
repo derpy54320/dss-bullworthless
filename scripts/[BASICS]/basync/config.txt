@@ -9,17 +9,20 @@ debugging true			# use the debug menu and provide extra info in some circumstanc
 sync_world true			# "false" to not sync the world or "true" to sync things like weather and time
 sync_entities full		# "off" to not sync, "full" to sync everything, or "partial" to only sync player peds and leave local entities alone
 
-[PREFERENCES]
+[OPTIONS]
+alt_ped_stop_method true		# limit the population instead of using StopPedProduction (needed if you use a script that relies on PedFindRandomSpawnPosition)
+allow_passengers true			# allow vehicle seats other than the driver seat to be used
+control_passout false			# let basync control the player's passout behavior (disable if you have another script to control this)
+force_player_ai true			# give the player ped player ai (disable this if you have another script that should control ai)
+
+[TUNING]
+slide_time_ms 150				# how many ms it takes for entities on the client to "slide" into their server position
 ped_pool_target 21				# if there are over 20 peds when a ped is created (not including the new ped), a single ambient ped will be deleted instantly
 ped_spawn_distance 55
 ped_despawn_distance 65
-vehicle_pool_target 10			# the normal limit is 15
+vehicle_pool_target 10			# the normal limit is 15 but it is safer to stay under this
 vehicle_spawn_distance 75
 vehicle_despawn_distance 85
-alt_ped_stop_method true		# limit the population instead of using StopPedProduction (needed if you use a script that relies on PedFindRandomSpawnPosition)
-allow_passengers true			# allow vehicle seats other than the driver seat to be used
-force_player_ai true			# give the player ped player ai (disable this if you have another script that should control ai)
-slide_time_ms 150				# how many ms it takes for entities on the client to "slide" into their server position
 
 [SYNC_MODULES]
 client_file modules/ped_actions.lua		# all client_files starting with "modules/" are loaded as sync modules
