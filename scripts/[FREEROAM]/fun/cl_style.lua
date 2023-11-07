@@ -1,12 +1,16 @@
 function main()
 	while true do
-		if PedMePlaying(gPlayer,"OFFENSE",true) then
+		if PedMePlaying(gPlayer,"OFFENSE",true) and not PedIsPlaying(gPlayer,"/G/ACTIONS/OFFENSE/RUNNINGATTACKS/RUNNINGATTACKSDIRECT",true) then
 			PedSetActionNode(gPlayer,"/G","")
 		elseif PedMePlaying(gPlayer,"DEFAULT_KEY",true) then
 			if PedIsPlaying(gPlayer,"/G/PLAYER/DEFAULT_KEY",true) then
 				PedSetActionTree(gPlayer,"","")
 			elseif IsButtonBeingPressed(6,0) then
-				PedSetActionNode(gPlayer,"/G/PLAYER/ATTACKS/STRIKES/LIGHTATTACKS/LEFT1","")
+				if PedMePlaying(gPlayer,"SPRINT",true) then
+					PedSetActionNode(gPlayer,"/G/ACTIONS/OFFENSE/RUNNINGATTACKS/RUNNINGATTACKSDIRECT","")
+				else
+					PedSetActionNode(gPlayer,"/G/PLAYER/ATTACKS/STRIKES/LIGHTATTACKS/LEFT1","")
+				end
 			elseif IsButtonBeingPressed(7,0) then
 				PedSetActionNode(gPlayer,"/G","")
 			elseif IsButtonBeingPressed(15,0) then
