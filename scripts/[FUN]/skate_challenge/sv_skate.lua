@@ -108,10 +108,11 @@ end
 function get_time(ms)
 	local s = math.floor(ms / 1000)
 	local m = math.floor(s / 60)
+	s = math.mod(s,60)
 	if m == 0 then
 		return s
 	elseif s < 10 then
-		return m..":0"..math.mod(s,60)
+		return m..":0"..s
 	end
-	return m..":"..math.mod(s,60)
+	return m..":"..s
 end
