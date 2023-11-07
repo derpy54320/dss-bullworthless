@@ -37,5 +37,12 @@ end)
 function get_in(veh,ped,seat)
 	if not veh:get_seat(seat) then
 		PedWarpIntoCar(ped,veh,seat)
+		return
+	end
+	for seat = 0,4 do
+		if not veh:get_seat(seat) then
+			PedWarpIntoCar(ped,veh,seat)
+			break
+		end
 	end
 end
