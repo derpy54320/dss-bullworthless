@@ -227,15 +227,15 @@ RegisterLocalEventHandler("ControllersUpdated",function()
 			y = y + 1
 		end
 		if IsKeyPressed("A",0) then
-			x = x - 1
+			x = x + 1
 		end
 		if IsKeyPressed("S",0) then
 			y = y - 1
 		end
 		if IsKeyPressed("D",0) then
-			x = x + 1
+			x = x - 1
 		end
-		SetStickValue(c,16,x)
-		SetStickValue(c,17,y)
+		SetStickValue(16,0,x)
+		SetStickValue(17,0,y)
 	end
 end)
