@@ -16,7 +16,7 @@ function api.notify(target,message,r,g,b)
 		args = {message}
 	end
 	if target ~= -1 then
-		if not IsPlayerValid(target) then
+		if type(target) ~= "number" or not IsPlayerValid(target) then
 			error("invalid player",2)
 		end
 		SendNetworkEvent(player,"chat:serverMessage",unpack(args))
@@ -37,7 +37,7 @@ function api.say(target,name,message,r,g,b)
 		args = {name,message,255,213,3}
 	end
 	if target ~= -1 then
-		if not IsPlayerValid(target) then
+		if type(target) ~= "number" or not IsPlayerValid(target) then
 			error("invalid player",2)
 		end
 		SendNetworkEvent(player,"chat:playerMessage",unpack(args))

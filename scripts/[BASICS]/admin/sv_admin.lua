@@ -24,7 +24,7 @@ function api.is_player_mod(player)
 	return false
 end
 function api.update_player(player)
-	if not IsPlayerValid(player) then
+	if type(player) ~= "number" or not IsPlayerValid(player) then
 		error("invalid player",2)
 	end
 	F_RefreshPermissions(player)

@@ -17,7 +17,7 @@ function api.notify(message,r,g,b)
 		end
 		F_AddMessage({s = tostring(message),r = r,g = g,b = b})
 	else
-		F_AddNotification("alert",tostring(message))
+		F_AddNotification("output",tostring(message))
 	end
 	SoundPlay2D("ButtonDown")
 end
@@ -190,7 +190,7 @@ end
 function F_AddNotification(type,text)
 	local msg = {s = text,r = 150,g = 150,b = 150}
 	if type == "alert" then
-		msg.r,msg.g,msg.b = 230,230,230
+		msg.r,msg.g,msg.b = 255,213,3
 	elseif type == "error" then
 		msg.r,msg.g,msg.b = 200,50,50
 	elseif type == "warning" then
@@ -412,7 +412,7 @@ RegisterNetworkEventHandler("chat:serverMessage",function(str,r,g,b)
 	if r then
 		F_AddMessage({s = str,r = r,g = g,b = b})
 	else
-		F_AddNotification("alert",str)
+		F_AddNotification("output",str)
 	end
 	SoundPlay2D("ButtonDown")
 end)
