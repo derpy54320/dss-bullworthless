@@ -218,3 +218,24 @@ RegisterNetworkEventHandler("skate:finishPlayer",function(id,score)
 		what.score = get_time(score)
 	end
 end)
+
+-- keyboard
+RegisterLocalEventHandler("ControllersUpdated",function(c)
+	if c == 0 and not IsUsingJoystick(c) then
+		local x,y = 0,0
+		if IsKeyPressed("W") then
+			y = y + 1
+		end
+		if IsKeyPressed("A") then
+			x = x - 1
+		end
+		if IsKeyPressed("S") then
+			y = y - 1
+		end
+		if IsKeyPressed("D") then
+			x = x + 1
+		end
+		SetStickValue(c,16,x)
+		SetStickValue(c,17,y)
+	end
+end)
