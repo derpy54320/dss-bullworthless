@@ -267,10 +267,12 @@ end
 RegisterNetworkEventHandler("basync:_deleteVehicle",function(player,id)
 	if gPlayers[player] then
 		local veh = shared.get_net_id(id)
-		if veh and veh == gVehicles[id] and veh.state.owner == player and RunLocalEvent("basync:deleteVehicle") then
-			veh:delete()
-		else
-			SendNetworkEvent(player,"basync:_undeleteVehicle",id)
+		if veh and veh == gVehicles[id] then
+			if veh.state.owner == player and RunLocalEvent("basync:deleteVehicle") then
+				veh:delete()
+			else
+				SendNetworkEvent(player,"basync:_undeleteVehicle",id)
+			end
 		end
 	end
 end)

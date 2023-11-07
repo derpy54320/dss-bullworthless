@@ -307,10 +307,12 @@ end
 RegisterNetworkEventHandler("basync:_deletePed",function(player,id)
 	if gPlayers[player] then
 		local ped = shared.get_net_id(id)
-		if ped and ped == gPeds[id] and ped.state.owner == player and RunLocalEvent("basync:deletePed",ped) then
-			ped:delete()
-		else
-			SendNetworkEvent(player,"basync:_undeletePed",id)
+		if ped and ped == gPeds[id] then
+			if ped.state.owner == player and RunLocalEvent("basync:deletePed",ped) then
+				ped:delete()
+			else
+				SendNetworkEvent(player,"basync:_undeletePed",id)
+			end
 		end
 	end
 end)
