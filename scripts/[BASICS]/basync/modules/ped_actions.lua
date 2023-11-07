@@ -111,9 +111,6 @@ local NODE_BLACKLIST = { -- patterns for unallowed nodes
 local function translate_node(node)
 	if string.find(node,"^/G/VEHICLES/SKATEBOARD") then
 		if string.find(node,"^/G/VEHICLES/SKATEBOARD/LOCOMOTION/RIDE") then
-			if string.find(node,"/PUMP") then
-				--return "/G/VEHICLES/SKATEBOARD/LOCOMOTION/RIDE/COAST/LOCOMOTIONS/STILL/IDLE"
-			end
 			return "/G/VEHICLES/SKATEBOARD/LOCOMOTION/RIDE/COAST/LOCOMOTIONS/STILL/IDLE"
 		end
 		return -- blacklist because skateboard
