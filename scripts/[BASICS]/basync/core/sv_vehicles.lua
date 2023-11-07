@@ -8,6 +8,7 @@ LoadScript("utility/modules.lua")
 LoadScript("utility/state.lua")
 
 -- config
+DEBUGGING = GetConfigBoolean(GetScriptConfig(),"debugging",false)
 SYNC_ENTITIES = string.lower(GetConfigString(GetScriptConfig(),"sync_entities","off"))
 ALLOW_PASSENGERS = GetConfigBoolean(GetScriptConfig(),"allow_passengers",false)
 REASSIGN_DIST = 5
@@ -293,7 +294,7 @@ RegisterNetworkEventHandler("basync:_updateVehicles",function(player,all_changes
 			end
 			for k,v in pairs(changes) do
 				if not check_update_value(k,v) then
-					return (kick_bad_args(player))
+					return (kick_bad_args(player,"["..tostring(k).."="..tostring(v).."]"))
 				end
 			end
 			veh.state:apply_changes(player,changes)
@@ -486,12 +487,17 @@ function send_updates()
 end
 
 -- utility
-function kick_bad_args(player)
-	local info = debug.getinfo(2,"l")
-	if info and info.currentline then
-		return KickPlayer(player,"your script misbehaved (vehicles:"..info.currentline..")")
+function kick_bad_args(player,info)
+	if DEBUGGING then
+		if not info then
+			info = debug.getinfo(2,"l")
+			info = info.currentline
+		end
+		if info then
+			return KickPlayer(player,"your script misbehaved (veh:"..info..")")
+		end
 	end
-	return KickPlayer(player,"your script misbehaved (vehicles:?)")
+	return KickPlayer(player,"your script misbehaved (veh:?)")
 end
 function copy_value(value)
 	if type(value) == "table" then
@@ -534,7 +540,7 @@ RegisterLocalEventHandler("ScriptShutdown",function(script)
 end)
 
 -- debug cutoff
-if not GetConfigBoolean(GetScriptConfig(),"allow_debug",false) then
+if not GetConfigBoolean(GetScriptConfig(),"debugging",false) then
 	return
 end
 

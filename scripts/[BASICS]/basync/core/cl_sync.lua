@@ -5,7 +5,7 @@ local hz
 CreateAdvancedThread("GAME2",function() -- runs post-game so changes from other scripts get sent immediately
 	local started
 	local updates = 0
-	if GetConfigBoolean(GetScriptConfig(),"allow_debug") then
+	if GetConfigBoolean(GetScriptConfig(),"debugging") then
 		StartScript("core/cl_debug.lua")
 	end
 	SendNetworkEvent("basync:_initPlayer")

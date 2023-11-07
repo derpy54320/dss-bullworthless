@@ -11,13 +11,13 @@ LoadScript("utility/state.lua")
 
 -- config
 SYNC_ENTITIES = string.lower(GetConfigString(GetScriptConfig(),"sync_entities","off"))
-SLIDE_TIME_SECS = GetConfigNumber(GetScriptConfig(),"slide_time_ms",0) / 1000
 PED_POOL_TARGET = GetConfigNumber(GetScriptConfig(),"ped_pool_target",0)
 PED_SPAWN_DISTANCE = GetConfigNumber(GetScriptConfig(),"ped_spawn_distance",0) ^ 2
 PED_DESPAWN_DISTANCE = GetConfigNumber(GetScriptConfig(),"ped_despawn_distance",0) ^ 2
-ALT_PED_STOP_METHOD = GetConfigBoolean(GetScriptConfig(),"ped_stop_alt_method",false)
+ALT_PED_STOP_METHOD = GetConfigBoolean(GetScriptConfig(),"alt_ped_stop_method",false)
 ALLOW_PASSENGERS = GetConfigBoolean(GetScriptConfig(),"allow_passengers",false)
 FORCE_PLAYER_AI = GetConfigBoolean(GetScriptConfig(),"force_player_ai",false)
+SLIDE_TIME_SECS = GetConfigNumber(GetScriptConfig(),"slide_time_ms",0) / 1000
 
 -- data
 AUTHORITY_MODELS = {[49]=1,[50]=1,[51]=1,[52]=1,[53]=1,[83]=1,[97]=1,[158]=1,[234]=0,[238]=1}
@@ -739,7 +739,7 @@ function update_ped_vehicle(ped,veh)
 end
 
 -- debug cutoff
-if not GetConfigBoolean(GetScriptConfig(),"allow_debug",false) then
+if not GetConfigBoolean(GetScriptConfig(),"debugging",false) then
 	return
 end
 

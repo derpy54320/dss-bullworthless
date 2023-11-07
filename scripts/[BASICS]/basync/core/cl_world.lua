@@ -114,7 +114,7 @@ CreateAdvancedThread("PRE_GAME",function() -- runs pre-game so updates are appli
 end)
 
 -- debug cutoff
-if not GetConfigBoolean(GetScriptConfig(),"allow_debug",false) then
+if not GetConfigBoolean(GetScriptConfig(),"debugging",false) then
 	return
 end
 

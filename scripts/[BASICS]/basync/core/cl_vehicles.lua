@@ -8,10 +8,10 @@ LoadScript("utility/state.lua")
 
 -- config
 SYNC_ENTITIES = string.lower(GetConfigString(GetScriptConfig(),"sync_entities","off"))
-SLIDE_TIME_SECS = GetConfigNumber(GetScriptConfig(),"slide_time_ms",0) / 1000
 VEH_POOL_TARGET = GetConfigNumber(GetScriptConfig(),"vehicle_pool_target",0)
 VEH_SPAWN_DISTANCE = GetConfigNumber(GetScriptConfig(),"vehicle_spawn_distance",0) ^ 2
 VEH_DESPAWN_DISTANCE = GetConfigNumber(GetScriptConfig(),"vehicle_despawn_distance",0) ^ 2
+SLIDE_TIME_SECS = GetConfigNumber(GetScriptConfig(),"slide_time_ms",0) / 1000
 
 -- globals
 mt_vehicle = {__index = {}}
@@ -410,7 +410,7 @@ function get_vehicle_pos(veh)
 end
 
 -- debug cutoff
-if not GetConfigBoolean(GetScriptConfig(),"allow_debug",false) then
+if not GetConfigBoolean(GetScriptConfig(),"debugging",false) then
 	return
 end
 

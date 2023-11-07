@@ -121,7 +121,7 @@ CreateAdvancedThread("GAME2",function() -- runs post-game so changes from other 
 end)
 
 -- debug cutoff
-if not GetConfigBoolean(GetScriptConfig(),"allow_debug",false) then
+if not GetConfigBoolean(GetScriptConfig(),"debugging",false) then
 	return
 end
 
