@@ -8,6 +8,7 @@ LoadScript("utility/nodes.lur")
 LoadScript("utility/state.lua")
 
 -- TODO: fix PedWarpOutOfCar with bikes
+-- TODO: check seat on server too
 
 -- config
 SYNC_ENTITIES = string.lower(GetConfigString(GetScriptConfig(),"sync_entities","off"))
@@ -26,7 +27,7 @@ VEHICLE_SEATS = {
 	[272] = 0, -- bmxrace
 	[273] = 0, -- retro
 	[274] = 0, -- crapbmx
-	[275] = 2, -- bikecop
+	[275] = 1, -- bikecop
 	[276] = 1, -- Scooter
 	[277] = 0, -- bike
 	[278] = 0, -- custombike
