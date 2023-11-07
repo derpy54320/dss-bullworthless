@@ -2,7 +2,7 @@
 spawn_distance 10		# how far a position must be from all players to be used
 despawn_distance 60		# how far away peds must be from all players to despawn
 spawn_limit_total 100	# how many ambient peds can be spawned in total
-spawn_limit_near 2		# how many ambient peds can be spawned near each player
+spawn_limit_near 10		# how many ambient peds can be spawned near each player
 spawn_near_dist 50		# how far "near" is considered to be for spawn_limit_near
 spawn_spacing 5
 spawn_timer 2000	# there can be spawn_burst spawns over spawn_timer milliseconds
