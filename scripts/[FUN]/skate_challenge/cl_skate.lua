@@ -223,18 +223,20 @@ end)
 RegisterLocalEventHandler("ControllersUpdated",function(c)
 	if c == 0 and not IsUsingJoystick(c) then
 		local x,y = 0,0
-		if IsKeyPressed("W") then
+		--[[
+		if IsKeyPressed("W",c) then
 			y = y + 1
 		end
-		if IsKeyPressed("A") then
+		if IsKeyPressed("A",c) then
 			x = x - 1
 		end
-		if IsKeyPressed("S") then
+		if IsKeyPressed("S",c) then
 			y = y - 1
 		end
-		if IsKeyPressed("D") then
+		if IsKeyPressed("D",c) then
 			x = x + 1
 		end
+		]]
 		SetStickValue(c,16,x)
 		SetStickValue(c,17,y)
 	end
