@@ -4,6 +4,7 @@ function main()
 	table.insert(gVehicles,VehicleCreateXYZ(290,193.575,6.883,5.454,164.3))
 	table.insert(gVehicles,VehicleCreateXYZ(291,202.151,6.377,5.502,3.4))
 	table.insert(gVehicles,VehicleCreateXYZ(297,198.894,-10.013,5.595,177.5))
+	table.insert(gVehicles,VehicleCreateXYZ(286,496.918,-204.536,4.174,4.9))
 end
 RegisterNetworkEventHandler("the_car:hit_button",function(player)
 	local ped = net.basync.get_player_ped(player)
