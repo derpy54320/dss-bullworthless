@@ -104,22 +104,19 @@ local NODE_BLACKLIST = { -- patterns for unallowed nodes
 	-- nodes should be in all caps and start with "/G" not "/GLOBAL"
 	"^/G/TAGS",
 	"^/G/SIGNS",
-	"^/G/VEHICLES/SKATEBOARD",
 	"^/G/AMBIENT/TALKING/TALKING/GEN/SPEECHANIMS/SPAWNS",
-}
-local NODE_WHITELIST = {
-	["^/G/VEHICLES/SKATEBOARD/LOCOMOTION/RIDE/COAST/LOCOMOTIONS/STILL/IDLE"] = "/G/VEHICLES/SKATEBOARD/LOCOMOTION/RIDE/COAST/LOCOMOTIONS/STILL/IDLE",
 }
 
 -- utility
 local function translate_node(node)
+	if string.find(node,"^/G/VEHICLES/SKATEBOARD") then
+		if string.find(node,"^/G/VEHICLES/SKATEBOARD/LOCOMOTION/RIDE") then
+			return "/G/VEHICLES/SKATEBOARD/LOCOMOTION/RIDE/COAST/LOCOMOTIONS/STILL/IDLE"
+		end
+		return -- blacklist because skateboard
+	end
 	for _,black in ipairs(NODE_BLACKLIST) do
 		if string.find(node,black) then
-			for white,override in pairs(NODE_WHITELIST) do
-				if string.find(node,white) then
-					return override
-				end
-			end
 			return
 		end
 	end
