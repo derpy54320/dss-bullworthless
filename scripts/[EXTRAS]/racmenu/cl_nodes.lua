@@ -57,7 +57,11 @@ function set_node(title,nodes,str,set)
 		return a[1] < b[1]
 	end)
 	while menu:active() do
-		if menu:option("< set >") and not set(gPlayer,str,"") then
+		local target = PedGetTargetPed(gPlayer)
+		if not PedIsValid(target) then
+			target = gPlayer
+		end
+		if menu:option("< set >") and not set(target,str,"") then
 			menu:alert("Failed to set node.",2)
 		end
 		for _,v in ipairs(options) do
