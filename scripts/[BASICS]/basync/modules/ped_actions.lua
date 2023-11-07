@@ -107,6 +107,24 @@ local NODE_BLACKLIST = { -- patterns for unallowed nodes
 	"^/G/VEHICLES/SKATEBOARD",
 	"^/G/AMBIENT/TALKING/TALKING/GEN/SPEECHANIMS/SPAWNS",
 }
+local NODE_WHITELIST = {
+	["^/G/VEHICLES/SKATEBOARD/LOCOMOTION/RIDE/COAST/LOCOMOTIONS/STILL/IDLE"] = "/G/VEHICLES/SKATEBOARD/LOCOMOTION/RIDE/COAST/LOCOMOTIONS/STILL/IDLE",
+}
+
+-- utility
+local function translate_node(node)
+	for _,black in ipairs(NODE_BLACKLIST) do
+		if string.find(node,black) then
+			for white,override in pairs(NODE_WHITELIST) do
+				if string.find(node,white) then
+					return override
+				end
+			end
+			return
+		end
+	end
+	return node
+end
 
 -- .tree
 module = create_module("tree","/GLOBAL/PLAYER")
@@ -134,23 +152,20 @@ module = create_module("node","/G")
 module:require_type("string")
 module:get_func(function(ped)
 	local s,t = PedGetActionNode(ped.ped,ped.node_s,ped.node_t)
-	for _,v in ipairs(NODE_BLACKLIST) do
-		if string.find(s,v) then
-			ped.node_s,ped.node_t = nil
-			return "/G"
-		end
+	s = translate_node(s)
+	if not s then
+		ped.node_s,ped.node_t = nil
+		return "/G"
 	end
 	ped.node_s,ped.node_t = s,t
 	return s
 end)
 module:set_func(function(ped,value)
 	if ped.state:was_updated("actnode") or (not ped.state:is_owner() and not PedIsPlaying(ped.ped,value,true)) then
-		for _,black in ipairs(NODE_BLACKLIST) do
-			if string.find(value,black) then
-				return
-			end
+		value = translate_node(value)
+		if value then
+			PedSetActionNode(ped.ped,value,"")
 		end
-		PedSetActionNode(ped.ped,value,"")
 	end
 end)
 
