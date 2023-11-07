@@ -69,6 +69,12 @@ function validate_vehicle(veh,level)
 		error("invalid vehicle",level+1)
 	end
 end
+function mt_vehicle:__tostring()
+	if gVehicles[self.id] == self then
+		return "vehicle: "..tostring(self.id)
+	end
+	return "invalid vehicle"
+end
 function mt_vehicle.__index:delete() -- delete's the vehicle handle if valid, NOT the network object
 	validate_vehicle(self,2)
 	if self.veh ~= -1 then

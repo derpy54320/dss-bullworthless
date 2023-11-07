@@ -120,6 +120,12 @@ function validate_ped(ped,level)
 		error("invalid ped",level+1)
 	end
 end
+function mt_ped:__tostring()
+	if gPeds[self.id] == self then
+		return "ped: "..tostring(self.id)
+	end
+	return "invalid ped"
+end
 function mt_ped.__index:is_valid(pre)
 	if type(self) ~= "table" or getmetatable(self) ~= mt_ped then
 		error("expected ped object",2)
