@@ -6,7 +6,7 @@ require_name basync
 
 [FEATURES]
 sync_world true			# "false" to not sync the world or "true" to sync things like weather and time
-sync_entities partial		# "off" to not sync, "full" to sync everything, or "partial" to only sync player peds and leave local entities alone
+sync_entities full		# "off" to not sync, "full" to sync everything, or "partial" to only sync player peds and leave local entities alone
 
 [OPTIONS]
 allow_debug true			# allow admins to use the basync debug menu
