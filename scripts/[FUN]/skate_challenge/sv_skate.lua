@@ -80,15 +80,11 @@ end)
 
 -- update challenge
 function update_challenge()
-	local playing = 0
 	local winner,biggest
 	for _,data in pairs(gChallenge) do
 		if data.playing then
-			playing = playing + 1
+			return
 		end
-	end
-	if playing > 1 then
-		return
 	end
 	for player,data in pairs(gChallenge) do
 		if data.playing then
