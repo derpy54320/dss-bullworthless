@@ -13,6 +13,11 @@ function main()
 				end
 			elseif IsButtonBeingPressed(7,0) then
 				PedSetActionNode(gPlayer,"/G","")
+			elseif IsButtonBeingPressed(9,0) then
+				local x,y,z = PlayerGetPosXYZ()
+				if PedFindInAreaXYZ(x,y,z,3) then
+					PedSetActionNode(gPlayer,"/G/ACTIONS/GRAPPLES/FRONT/GRAPPLES/GRAPPLEATTEMPT","")
+				end
 			elseif IsButtonBeingPressed(15,0) then
 				PedSetFlag(gPlayer,2,not PedGetFlag(gPlayer,2))
 			end
