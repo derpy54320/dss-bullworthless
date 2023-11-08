@@ -70,13 +70,16 @@ function main()
 				if PedIsValid(v) then
 					if ped:is_owner() then
 						local faction = PedGetFaction(v)
+						if faction == 6 or faction == 9 or faction == 10 then
+							faction = -1 -- they'll even hate their own faction
+						end
 						for rival = 0,13 do
 							if rival ~= faction and PedGetPedToTypeAttitude(v,rival) ~= 0 then
 								PedSetPedToTypeAttitude(v,rival,0)
 							end
 						end
 						for target in AllPeds() do
-							if PedGetFaction(target) ~= faction then
+							if target ~= v and PedGetFaction(target) ~= faction then
 								PedSetEmotionTowardsPed(v,target,0)
 							end
 						end
