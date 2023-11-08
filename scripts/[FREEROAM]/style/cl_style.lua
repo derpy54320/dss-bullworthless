@@ -2,14 +2,19 @@ function MissionCleanup()
 	PedSetActionTree(gPlayer,"","")
 end
 function main()
+	local model
 	local thread
 	while not SystemIsReady() do
 		Wait(0)
 	end
 	while true do
-		if PedIsModel(gPlayer,0) then
+		local switch = PedGetModelId(gPlayer)
+		if switch ~= model then
+			PedSetActionTree(gPlayer,"","")
+			model = switch
+		end
+		if model == 0 then
 			if thread then
-				PedSetActionTree(gPlayer,"","")
 				TerminateThread(thread)
 				thread = nil
 			end
@@ -23,7 +28,13 @@ function custom_style()
 	while true do
 		if PedMePlaying(gPlayer,"OFFENSE",true) then
 			PedSetActionNode(gPlayer,"/G","")
-		elseif PedMePlaying(gPlayer,"DEFAULT_KEY",true) and check_action_tree() then
+		elseif PedMePlaying(gPlayer,"DEFAULT_KEY",true) then
+			for node,tree in pairs(gOverrides) do
+				if PedIsPlaying(gPlayer,node,true) then
+					PedSetActionTree(gPlayer,unpack(tree))
+					break
+				end
+			end
 			if IsButtonBeingPressed(6,0) then
 				if PedMePlaying(gPlayer,"SPRINT",true) then
 					PedSetActionNode(gPlayer,"/G/PLAYER/ATTACKS/STRIKES/RUNNINGATTACKS/HEAVYATTACKS","")
@@ -41,16 +52,7 @@ function custom_style()
 		Wait(0)
 	end
 end
-function check_action_tree()
-	for _,v in ipairs(gOverrides) do
-		if PedIsPlaying(gPlayer,v[1],true) then
-			PedSetActionTree(gPlayer,v[2],v[3])
-			return false
-		end
-	end
-	return true
-end
 gOverrides = {
-	{"/G/PLAYER","",""},
-	{"/G/CV_MALE_A","/GLOBAL/GS_MALE_A","ACT/ANIM/GS_MALE_A.ACT"},
+	["/G/CV_MALE_A"] = {"/GLOBAL/GS_MALE_A","ACT/ANIM/GS_MALE_A.ACT"},
+	["/G/N_STRIKER_B"] = {"/GLOBAL/N_STRIKER_A","ACT/ANIM/N_STRIKER_A.ACT"},
 }
