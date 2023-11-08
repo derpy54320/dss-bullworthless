@@ -403,7 +403,10 @@ function validate_peds() -- create / delete peds
 			local real = PedCreateXYZ(ped.server.model,x,y,z) -- create the closest peds that there is space for
 			if PedIsValid(real) then
 				if ped.server.type == "player" then
-					AddBlipForChar(real,0,1,1)
+					local blip = AddBlipForChar(real,0,1,1)
+					if blip ~= -1 then
+						BlipSetShortRanged(blip,true)
+					end
 				end
 				PedSetAlpha(real,0,false) -- make the ped fade in on spawn
 				set_ped(ped,real)
