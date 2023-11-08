@@ -9,7 +9,7 @@ function main()
 			if ped then
 				SetTextFont("Arial")
 				SetTextBlack()
-				SetTextColor(255,150,50,255)
+				SetTextColor(230,230,50,255)
 				SetTextOutline()
 				SetTextAlign("C","C")
 				SetTextPosition(0.5,0.9)
