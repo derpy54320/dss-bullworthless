@@ -3,6 +3,7 @@ SPAWN_DISTANCE = GetConfigNumber(GetScriptConfig(),"spawn_distance",0)
 SPAWN_SPACING = GetConfigNumber(GetScriptConfig(),"spawn_spacing",0) ^ 2
 SPAWN_TIMER = GetConfigNumber(GetScriptConfig(),"spawn_timer",0)
 SPAWN_BURST = GetConfigNumber(GetScriptConfig(),"spawn_burst",0)
+RIOT_MODE = true
 
 -- globals
 gPeds = {}
@@ -68,6 +69,17 @@ function main()
 				local v = ped:get_ped()
 				if PedIsValid(v) then
 					if ped:is_owner() then
+						local faction = PedGetFaction(v)
+						for rival = 0,13 do
+							if rival ~= faction and PedGetPedToTypeAttitude(v,rival) ~= 0 then
+								PedSetPedToTypeAttitude(v,rival,0)
+							end
+						end
+						for target in AllPeds() do
+							if PedGetFaction(target) ~= faction then
+								PedSetEmotionTowardsPed(v,target,0)
+							end
+						end
 						if not wandering[v] then
 							PedWander(v)
 							wandering[v] = true
