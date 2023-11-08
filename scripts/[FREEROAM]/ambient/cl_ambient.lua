@@ -3,7 +3,7 @@ SPAWN_DISTANCE = GetConfigNumber(GetScriptConfig(),"spawn_distance",0)
 SPAWN_SPACING = GetConfigNumber(GetScriptConfig(),"spawn_spacing",0) ^ 2
 SPAWN_TIMER = GetConfigNumber(GetScriptConfig(),"spawn_timer",0)
 SPAWN_BURST = GetConfigNumber(GetScriptConfig(),"spawn_burst",0)
-RIOT_MODE = true
+RIOT_MODE = false
 
 -- globals
 gPeds = {}
