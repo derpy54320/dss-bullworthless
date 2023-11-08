@@ -12,7 +12,7 @@ function main()
 				SetTextColor(230,230,50,255)
 				SetTextOutline()
 				SetTextAlign("C","C")
-				SetTextPosition(0.5,0.9)
+				SetTextPosition(0.5,0.95)
 				DrawText("["..ped:get_name().."]")
 			end
 		end
