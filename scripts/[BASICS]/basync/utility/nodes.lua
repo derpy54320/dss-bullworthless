@@ -2,8 +2,8 @@
 
 local COMMON
 local GLOBAL
-local F_GetActNode
-local F_GetAiNode
+local get_act_node
+local get_ai_node
 local none = {}
 
 -- utility:
@@ -12,30 +12,30 @@ function GetRootActionNode()
 end
 function PedGetActionNode(ped,hints,hintr) -- returns the node as a string and also the node table for hinting the next call
 	if hints and PedIsPlaying(ped,hints,true) then
-		return F_GetActNode(ped,hintr,hints.."/")
+		return get_act_node(ped,hintr,hints.."/")
 	end
-	return F_GetActNode(ped,GLOBAL,"/G/")
+	return get_act_node(ped,GLOBAL,"/G/")
 end
 function PedGetTaskNode(ped,hints,hintr)
 	if hints and PedIsDoingTask(ped,hints,true) then
-		return F_GetAiNode(ped,hintr,hints.."/")
+		return get_ai_node(ped,hintr,hints.."/")
 	end
-	return F_GetAiNode(ped,GLOBAL,"/G/")
+	return get_ai_node(ped,GLOBAL,"/G/")
 end
 
 -- internal:
-function F_GetActNode(ped,root,text)
+function get_act_node(ped,root,text)
 	for k,v in pairs(root) do
 		if PedIsPlaying(ped,text..k,true) then
-			return F_GetActNode(ped,v,text..k.."/")
+			return get_act_node(ped,v,text..k.."/")
 		end
 	end
 	return string.sub(text,1,-2),root -- get rid of trailing /
 end
-function F_GetAiNode(ped,root,text)
+function get_ai_node(ped,root,text)
 	for k,v in pairs(root) do
 		if PedIsDoingTask(ped,text..k,true) then
-			return F_GetAiNode(ped,v,text..k.."/")
+			return get_ai_node(ped,v,text..k.."/")
 		end
 	end
 	return string.sub(text,1,-2),root -- get rid of trailing /

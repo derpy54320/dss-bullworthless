@@ -7,6 +7,8 @@ LoadScript("utility/models.lua")
 LoadScript("utility/modules.lua")
 LoadScript("utility/state.lua")
 
+-- TODO: validate seats with VEHICLE_SEATS
+
 -- config
 DEBUGGING = GetConfigBoolean(GetScriptConfig(),"debugging",false)
 SYNC_ENTITIES = string.lower(GetConfigString(GetScriptConfig(),"sync_entities","off"))

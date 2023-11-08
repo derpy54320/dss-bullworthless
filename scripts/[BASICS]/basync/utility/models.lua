@@ -1,6 +1,6 @@
 -- model utility
--- use these tables to convert model numbers to model names *and* to validate models (so don't include models that shouldn't be allowed)
 
+-- [number] = name tables
 PED_MODELS = {
 	[0] = "player",--[[1] = "DEFAULTPED",]][2] = "DOgirl_Zoe_EG",[3] = "NDGirl_Beatrice",[4] = "NDH1a_Algernon",
 	[5] = "NDH1_Fatty",[6] = "ND2nd_Melvin",[7] = "NDH2_Thad",[8] = "NDH3_Bucky",[9] = "NDH2a_Cornelius",
@@ -66,4 +66,36 @@ VEHICLE_MODELS = {
 	[279] = "banbike",[280] = "mtnbike",[281] = "oladbike",[282] = "racer",[283] = "aquabike",[284] = "Mower",[285] = "Arc_3",
 	[286] = "taxicab",[287] = "Arc_2",[288] = "Dozer",[289] = "GoCart",[290] = "Limo",[291] = "Dlvtruck",[292] = "Foreign",
 	[293] = "cargreen",[294] = "70wagon",[295] = "policecar",[296] = "domestic",[297] = "Truck",[298] = "Arc_1"
+}
+
+-- other model data
+VEHICLE_SEATS = {
+	-- 0 = bike, 1 = car, 2+ = car w/ passenger(s)
+	[272] = 0, -- bmxrace
+	[273] = 0, -- retro
+	[274] = 0, -- crapbmx
+	[275] = 1, -- bikecop
+	[276] = 1, -- Scooter
+	[277] = 0, -- bike
+	[278] = 0, -- custombike
+	[279] = 0, -- banbike
+	[280] = 0, -- mtnbike
+	[281] = 0, -- oladbike
+	[282] = 0, -- racer
+	[283] = 0, -- aquabike
+	[284] = 1, -- Mower
+	[285] = 1, -- Arc_3
+	[286] = 2, -- taxicab
+	[287] = 1, -- Arc_2
+	[288] = 1, -- Dozer
+	[289] = 1, -- GoCart
+	[290] = 4, -- Limo
+	[291] = 2, -- Dlvtruck
+	[292] = 2, -- Foreign
+	[293] = 2, -- cargreen
+	[294] = 2, -- 70wagon
+	[295] = 2, -- policecar
+	[296] = 2, -- domestic
+	[297] = 2, -- Truck
+	[298] = 1, -- Arc_1
 }

@@ -24,16 +24,6 @@ vehicle_pool_target 10			# the normal limit is 15 but it is safer to stay under 
 vehicle_spawn_distance 75
 vehicle_despawn_distance 85
 
-[SYNC_MODULES]
-client_file modules/ped_actions.lua		# all client_files starting with "modules/" are loaded as sync modules
-client_file modules/ped_ai.lua
-client_file modules/ped_flags.lua
-client_file modules/ped_punishment.lua
-client_file modules/ped_speech.lua
-client_file modules/ped_stats.lua
-client_file modules/ped_target.lua
-client_file modules/ped_throttle.lua
-
 [CORE_SCRIPTS]
 main_script core/sv_sync.lua			# "main" sync scripts
 client_script core/cl_sync.lua
@@ -45,6 +35,16 @@ main_script core/sv_vehicles.lua		# vehicle sync
 client_script core/cl_vehicles.lua
 main_script core/sv_api.lua				# helpful global server functions (you can remove this script if desired)
 client_file core/cl_debug.lua			# debug menu for admins (only started if allow_debug is on)
+
+[MODULE_SCRIPTS]
+client_file modules/ped_actions.lua		# all client_files starting with "modules/" are loaded as sync modules
+client_file modules/ped_ai.lua
+client_file modules/ped_flags.lua
+client_file modules/ped_punishment.lua
+client_file modules/ped_speech.lua
+client_file modules/ped_stats.lua
+client_file modules/ped_target.lua
+client_file modules/ped_throttle.lua
 
 [UTILITY_SCRIPTS]
 client_file utility/debug.lua

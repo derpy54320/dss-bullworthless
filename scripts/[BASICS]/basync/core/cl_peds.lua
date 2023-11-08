@@ -8,8 +8,6 @@ LoadScript("utility/nodes.lur")
 LoadScript("utility/state.lua")
 
 -- TODO: fix PedWarpOutOfCar with bikes
--- TODO: check seat on server too
--- TODO: delete all peds on cleanup
 
 -- config
 SYNC_ENTITIES = string.lower(GetConfigString(GetScriptConfig(),"sync_entities","off"))
@@ -23,36 +21,6 @@ SLIDE_TIME_SECS = GetConfigNumber(GetScriptConfig(),"slide_time_ms",0) / 1000
 
 -- data
 AUTHORITY_MODELS = {[49]=1,[50]=1,[51]=1,[52]=1,[53]=1,[83]=1,[97]=1,[158]=1,[234]=0,[238]=1}
-VEHICLE_SEATS = {
-	-- 0 = bike, 1 = car, 2+ = car w/ passenger(s)
-	[272] = 0, -- bmxrace
-	[273] = 0, -- retro
-	[274] = 0, -- crapbmx
-	[275] = 1, -- bikecop
-	[276] = 1, -- Scooter
-	[277] = 0, -- bike
-	[278] = 0, -- custombike
-	[279] = 0, -- banbike
-	[280] = 0, -- mtnbike
-	[281] = 0, -- oladbike
-	[282] = 0, -- racer
-	[283] = 0, -- aquabike
-	[284] = 1, -- Mower
-	[285] = 1, -- Arc_3
-	[286] = 2, -- taxicab
-	[287] = 1, -- Arc_2
-	[288] = 1, -- Dozer
-	[289] = 1, -- GoCart
-	[290] = 4, -- Limo
-	[291] = 2, -- Dlvtruck
-	[292] = 2, -- Foreign
-	[293] = 2, -- cargreen
-	[294] = 2, -- 70wagon
-	[295] = 2, -- policecar
-	[296] = 2, -- domestic
-	[297] = 2, -- Truck
-	[298] = 1, -- Arc_1
-}
 
 -- globals
 mt_ped = {__index = {}}
