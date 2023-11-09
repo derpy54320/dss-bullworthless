@@ -42,7 +42,7 @@ function M_SpawnVehicle()
 					if gBlip ~= -1 then
 						BlipRemove(gBlip)
 					end
-					gBlip = BlipAddXYZ(x,y,z,4,0,1)
+					gBlip = BlipAddXYZ(x,y,z,9,1)
 					gAdded = GetTimer()
 					return
 				end
