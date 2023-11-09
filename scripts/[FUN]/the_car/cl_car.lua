@@ -31,7 +31,7 @@ function M_SpawnVehicle()
 		for _,m in ipairs(cars) do
 			if menu:option(VEHICLE_MODELS[m]) then
 				local expire = GetTimer() + 1000
-				local x,y,z = VehicleFindRandomSpawnPosition()
+				local x,y,z = PedGetOffsetInWorldCoords(gPlayer,0,3,0)--VehicleFindRandomSpawnPosition()
 				while x == 9999 and GetTimer() < expire do
 					menu:draw(true)
 					Wait(0)
