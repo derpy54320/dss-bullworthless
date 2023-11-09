@@ -32,6 +32,7 @@ function M_SpawnVehicle()
 				break
 			end
 		end
+		menu:draw()
 		Wait(0)
 	end
 end
