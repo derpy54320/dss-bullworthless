@@ -11,8 +11,8 @@ gPlayers = {}
 gWorld = {
 	chapter = 0,
 	weather = 0,
-	hour = 1,
-	minute = 55,
+	hour = 8,
+	minute = 0,
 	rate = 1000, -- ms per minute (or 0 for frozen time)
 }
 
