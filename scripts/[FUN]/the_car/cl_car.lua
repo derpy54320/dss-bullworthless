@@ -1,3 +1,6 @@
+gBlip = -1
+gAdded = 0
+
 RegisterLocalEventHandler("menu:openMain",function(add)
 	add("Call Mechanic","\"I'm Johnny on the spot! Need some wheels?",M_SpawnVehicle)
 end)
@@ -9,7 +12,16 @@ function main()
 		if IsButtonBeingPressed(9,0) and PedMePlaying(gPlayer,"DEFAULT_KEY",true) then
 			SendNetworkEvent("the_car:hit_button")
 		end
+		if gBlip ~= -1 and GetTimer() - gAdded >= 15000 then
+			BlipRemove(gBlip)
+			gBlip = -1
+		end
 		Wait(0)
+	end
+end
+function MissionCleanup()
+	if gBlip ~= -1 then
+		BlipRemove(gBlip)
 	end
 end
 function M_SpawnVehicle()
@@ -27,6 +39,11 @@ function M_SpawnVehicle()
 					SendNetworkEvent("the_car:spawn_car",m,AreaGetVisible(),x,y,z)
 					SoundPlay2D("BuyItem")
 					PlayerAddMoney(-5000)
+					if gBlip ~= -1 then
+						BlipRemove(gBlip)
+					end
+					gBlip = BlipAddXYZ(x,y,z,4,0,1)
+					gAdded = GetTimer()
 					return
 				end
 				break
