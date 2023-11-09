@@ -30,7 +30,12 @@ function M_SpawnVehicle()
 	while menu:active() do
 		for _,m in ipairs(cars) do
 			if menu:option(VEHICLE_MODELS[m]) then
+				local expire = GetTimer() + 1000
 				local x,y,z = VehicleFindRandomSpawnPosition()
+				while x == 9999 and GetTimer() < expire do
+					menu:draw(true)
+					Wait(0)
+				end
 				if x == 9999 then
 					menu:alert("Sorry, your car isn't available right now.",3)
 				elseif PlayerGetMoney() < 5000 then
