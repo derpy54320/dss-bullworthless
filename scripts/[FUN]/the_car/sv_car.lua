@@ -17,7 +17,7 @@ end)
 RegisterNetworkEventHandler("the_car:hit_button",function(player)
 	local ped = net.basync.get_player_ped(player)
 	if PedIsValid(ped) and not PedIsInAnyVehicle(ped) then
-		for _,veh in net.basync.all_vehicles() do
+		for veh in net.basync.all_vehicles() do
 			local x1,y1,z1,h = veh:get_position()
 			local x2,y2,z2 = ped:get_position()
 			local dx,dy,dz = x2-x1,y2-y1,z2-z1
