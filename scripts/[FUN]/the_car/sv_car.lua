@@ -1,4 +1,4 @@
-local gVehicles = {}
+gVehicles = {}
 
 function main()
 	table.insert(gVehicles,VehicleCreateXYZ(290,193.575,6.883,5.454,164.3))
@@ -9,30 +9,33 @@ function main()
 	table.insert(gVehicles,VehicleCreateXYZ(287,511.537,505.133,19.615,97.6))
 	table.insert(gVehicles,VehicleCreateXYZ(298,518.221,496.925,19.615,-2.3))
 end
+RegisterNetworkEventHandler("the_car:spawn_car",function(player,model,area,x,y,z)
+	local car = net.basync.create_vehicle(model)
+	car:set_position(x,y,z)
+	car:set_area(area)
+end)
 RegisterNetworkEventHandler("the_car:hit_button",function(player)
 	local ped = net.basync.get_player_ped(player)
 	if PedIsValid(ped) and not PedIsInAnyVehicle(ped) then
-		for _,veh in ipairs(gVehicles) do
-			if VehicleIsValid(veh) then
-				local x1,y1,z1,h = veh:get_position()
-				local x2,y2,z2 = ped:get_position()
-				local dx,dy,dz = x2-x1,y2-y1,z2-z1
-				if dx*dx+dy*dy+dz*dz < 3 * 3 then
-					local angle = math.atan2(-dx,dy) - math.pi / 2 - math.rad(h)
-					angle = math.mod(angle,math.pi*2)
-					while angle > math.pi do
-						angle = angle - math.pi * 2
-					end
-					while angle <= -math.pi do
-						angle = angle + math.pi * 2
-					end
-					if math.abs(angle) <= math.rad(90) then
-						get_in(veh,ped,0)
-					else
-						get_in(veh,ped,1)
-					end
-					break
+		for _,veh in net.basync.all_vehicles() do
+			local x1,y1,z1,h = veh:get_position()
+			local x2,y2,z2 = ped:get_position()
+			local dx,dy,dz = x2-x1,y2-y1,z2-z1
+			if dx*dx+dy*dy+dz*dz < 3 * 3 then
+				local angle = math.atan2(-dx,dy) - math.pi / 2 - math.rad(h)
+				angle = math.mod(angle,math.pi*2)
+				while angle > math.pi do
+					angle = angle - math.pi * 2
 				end
+				while angle <= -math.pi do
+					angle = angle + math.pi * 2
+				end
+				if math.abs(angle) <= math.rad(90) then
+					get_in(veh,ped,0)
+				else
+					get_in(veh,ped,1)
+				end
+				break
 			end
 		end
 	end
