@@ -1,6 +1,8 @@
 -- server world sync
 basync = GetScriptNetworkTable()
 
+-- TODO: fix passout
+
 -- config
 SYNC_WORLD = GetConfigBoolean(GetScriptConfig(),"sync_world",false)
 PASS_OUT = GetConfigBoolean(GetScriptConfig(),"control_passout",false)
