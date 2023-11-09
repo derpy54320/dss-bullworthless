@@ -12,7 +12,7 @@ sync_entities full		# "off" to not sync, "full" to sync everything, or "partial"
 [OPTIONS]
 alt_ped_stop_method true		# limit the population instead of using StopPedProduction (needed if you use a script that relies on PedFindRandomSpawnPosition)
 allow_passengers true			# allow vehicle seats other than the driver seat to be used
-control_passout true			# let basync control the player's passout behavior (disable if you have another script to control this)
+control_passout false			# let basync control the player's passout behavior (disable if you have another script to control this)
 force_player_ai true			# give the player ped player ai (disable this if you have another script that should control ai)
 
 [TUNING]

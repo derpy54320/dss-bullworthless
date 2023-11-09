@@ -1,3 +1,2 @@
-auto_start false
 require_version 5
 client_script sleepless.lua
