@@ -138,3 +138,23 @@ function sst.set_ai_tree()
 		Wait(0)
 	end
 end
+
+-- search
+function search_nodes(results,pattern,prefix,nodes)
+	local any = false
+	for node,more in pairs(nodes) do
+		if not search_nodes(results,pattern,prefix.."/"..node,more) and string.find(node,pattern) then
+			table.insert(results,prefix.."/"..node)
+			any = true
+		end
+	end
+	return any
+end
+SetCommand("search_node",function(pattern)
+	local results = {}
+	search_nodes(results,string.upper(pattern),"/G",GetRootActionNode())
+	table.sort(results)
+	for _,result in ipairs(results) do
+		print(result)
+	end
+end)
