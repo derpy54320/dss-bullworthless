@@ -149,7 +149,7 @@ function shared.run_world_menu()
 				SendNetworkEvent("basync:_debugChapter",value-1)
 			end
 		elseif menu:option("Set Weather","["..gWorld.weather.."]") then
-			local value = get_menu_value(menu,gWorld.weather,1,0,5,false)
+			local value = get_menu_value(menu,gWorld.weather,1,0,69420,false)
 			if value then
 				SendNetworkEvent("basync:_debugWeather",value)
 			end
