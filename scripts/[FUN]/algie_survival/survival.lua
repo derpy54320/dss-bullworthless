@@ -1,5 +1,5 @@
 LoadScript("spawns.lua") -- just a table named gSpawns with all our spawn points
-MAX_PEDS = 20
+MAX_PEDS = 18
 
 gBackupWeapons = {}
 gRunPunch = -1 -- last time a ped did a running punch (or -1 for never)
