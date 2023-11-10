@@ -7,7 +7,7 @@ require_name basync
 [FEATURES]
 debugging true			# use the debug menu and provide extra info in some circumstances
 sync_world true			# "false" to not sync the world or "true" to sync things like weather and time
-sync_entities partial		# "off" to not sync, "full" to sync everything, or "partial" to only sync player peds and leave local entities alone
+sync_entities full		# "off" to not sync, "full" to sync everything, or "partial" to only sync player peds and leave local entities alone
 
 [OPTIONS]
 alt_ped_stop_method true		# limit the population instead of using StopPedProduction (needed if you use a script that relies on PedFindRandomSpawnPosition)
