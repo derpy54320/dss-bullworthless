@@ -1,0 +1,4 @@
+# we use "launcher.lua" to control when "survival.lua" will start (so it is the only main_script we want)
+client_script launcher.lua
+client_file survival.lua
+client_file spawns.lua
