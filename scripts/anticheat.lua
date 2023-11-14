@@ -1,3 +1,5 @@
+DontAutoStartScript()
+
 RegisterLocalEventHandler("PlayerConnecting",function(player,hashes)
 	if not IsHash(hashes.scripts,"2DE6E966") then
 		return KickPlayer(player,"you are running a modded scripts.img")
