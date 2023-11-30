@@ -8,6 +8,7 @@ LoadScript("utility/nodes.lur")
 LoadScript("utility/state.lua")
 
 -- TODO: fix PedWarpOutOfCar with bikes
+-- TODO: make sure updates aren't sent when area transition
 
 -- config
 SYNC_ENTITIES = string.lower(GetConfigString(GetScriptConfig(),"sync_entities","off"))

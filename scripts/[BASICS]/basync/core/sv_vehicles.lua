@@ -7,7 +7,6 @@ LoadScript("utility/models.lua")
 LoadScript("utility/modules.lua")
 LoadScript("utility/state.lua")
 
--- TODO: validate seats with VEHICLE_SEATS
 -- config
 DEBUGGING = GetConfigBoolean(GetScriptConfig(),"debugging",false)
 SYNC_ENTITIES = string.lower(GetConfigString(GetScriptConfig(),"sync_entities","off"))
@@ -110,6 +109,18 @@ function mt_vehicle.__index:is_valid()
 	end
 	return gVehicles[self.id] == self
 end
+function mt_vehicle.__index:is_seat_valid(seat)
+	validate_vehicle(self,2)
+	local count = VEHICLE_SEATS[self.server.model]
+	if not ALLOW_PASSENGERS or count == 0 then
+		return seat == 0
+	end
+	return type(seat) == "number" and math.floor(seat) == seat and seat >= 0 and seat < count
+end
+function mt_vehicle.__index:is_bike()
+	validate_vehicle(self,2)
+	return VEHICLE_SEATS[self.server.model] == 0
+end
 function mt_vehicle.__index:lock_owner()
 	validate_vehicle(self,2)
 	self.auto_owner = true
@@ -149,10 +160,12 @@ function mt_vehicle.__index:get_seat(seat)
 	validate_vehicle(self,2)
 	if seat == nil then
 		seat = 0
-	elseif type(seat) ~= "number" or math.floor(seat) ~= seat or seat < 0 then
-		error("invalid seat",2)
 	end
 	return self.seats[seat]
+end
+function mt_vehicle.__index:get_seat_count()
+	validate_vehicle(self,2)
+	return math.max(VEHICLE_SEATS[self.server.model],1) -- at least 1 since bikes are represented by a 0
 end
 function mt_vehicle.__index:set_owner(player) -- return false if it can't set the owner to that player yet
 	validate_vehicle(self,2)
@@ -204,10 +217,8 @@ function mt_vehicle.__index:set_seat(seat,ped)
 	validate_vehicle(self,2)
 	if seat == nil then
 		seat = 0
-	elseif not ALLOW_PASSENGERS and seat ~= 0 then
+	elseif not self:is_seat_valid(seat) then
 		return false
-	elseif type(seat) ~= "number" or math.floor(seat) ~= seat or seat < 0 then
-		error("invalid seat",2)
 	end
 	if ped == nil then
 		local ped = self.seats[seat]
@@ -219,10 +230,8 @@ function mt_vehicle.__index:set_seat(seat,ped)
 	elseif self.seats[seat] ~= ped then
 		if not basync.is_ped_valid(ped) then
 			error("invalid ped",2)
-		elseif self.seats[seat] then
-			error("seat already occupied",2)
-		elseif ped.vehicle then
-			error("ped already in a vehicle",2)
+		elseif ped.vehicle or self.seats[seat] then
+			return false
 		end
 		self.seats[seat] = ped
 		ped.server.pos = {unpack(self.server.pos)}

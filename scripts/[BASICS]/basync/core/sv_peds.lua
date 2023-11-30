@@ -7,8 +7,6 @@ LoadScript("utility/models.lua")
 LoadScript("utility/modules.lua")
 LoadScript("utility/state.lua")
 
--- TODO: validate seats with VEHICLE_SEATS
-
 -- config
 DEBUGGING = GetConfigBoolean(GetScriptConfig(),"debugging",false)
 SYNC_ENTITIES = string.lower(GetConfigString(GetScriptConfig(),"sync_entities","off"))
@@ -111,7 +109,7 @@ function mt_ped:__tostring()
 end
 function mt_ped.__index:delete()
 	validate_ped(self,2)
-	if self.vehicle and self.vehicle.seats[self.seat] == self then
+	if self.vehicle then
 		self.vehicle:set_seat(self.seat,nil)
 	end
 	for p in pairs(gPlayers) do
@@ -225,30 +223,28 @@ function mt_ped.__index:warp_into_vehicle(veh,seat)
 	validate_ped(self,2)
 	if seat == nil then
 		seat = 0
-	elseif not ALLOW_PASSENGERS and seat ~= 0 then
-		return false
-	elseif type(seat) ~= "number" or math.floor(seat) ~= seat or seat < 0 then
-		error("invalid seat",2)
 	end
 	if not basync.is_vehicle_valid(veh) then
 		error("invalid vehicle",2)
-	elseif veh.seats[seat] and veh.seats[seat] ~= self then
-		error("seat already occupied",2)
+	elseif veh:is_seat_valid(seat) and (not veh.seats[seat] or veh.seats[seat] == self) then
+		if self.vehicle and veh.seats[self.seat] == self then
+			veh:set_seat(self.seat,nil) -- warp out of current car first
+		end
+		if not self.vehicle and not veh.seats[seat] then
+			return veh:set_seat(seat,self)
+		end
 	end
-	if self.vehicle and (self.vehicle.seats[self.seat] ~= self or not self.vehicle:set_seat(self.seat,nil)) then
-		error("failed to warp out of vehicle",2) -- should never actually happen
-	end
-	veh:set_seat(seat,self)
-	return true
+	return false
 end
 function mt_ped.__index:warp_out_of_vehicle()
 	validate_ped(self,2)
 	if self.vehicle then
-		if self.vehicle.seats[self.seat] ~= self then
-			error("failed to warp out of vehicle",2) -- should never actually happen
+		if self.vehicle.seats[self.seat] == self then
+			return self.vehicle:set_seat(self.seat,nil)
 		end
-		self.vehicle:set_seat(self.seat,nil)
+		return false -- should never actually happen but it's just a fail-safe
 	end
+	return true
 end
 
 -- ped utility
@@ -333,10 +329,9 @@ RegisterNetworkEventHandler("basync:_setVehicle",function(player,id,vid,seat)
 		local ped = shared.get_net_id(id)
 		if ped and ped == gPeds[id] and not ped.state.updating._vehicle then
 			local veh = basync.get_vehicle_from_player(vid)
-			if veh and ((not ALLOW_PASSENGERS and seat ~= 0) or type(seat) ~= "number" or math.floor(seat) ~= seat or seat < 0) then
+			if veh and not veh:is_seat_valid(seat) then
 				return (kick_bad_args(player))
-			end
-			if veh and (not veh.seats[seat] or veh.seats[seat] == ped) then
+			elseif veh and (not veh.seats[seat] or veh.seats[seat] == ped) then
 				ped:warp_into_vehicle(veh,seat)
 			else
 				ped:warp_out_of_vehicle()

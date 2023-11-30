@@ -116,6 +116,7 @@ CreateAdvancedThread("PRE_GAME",function() -- runs pre-game so updates are appli
 				ClockSet(7,59)
 			end
 			ClockSetTickRate(60)
+			PlayerChangePhysicalState(2)
 			Wait(3000) -- some time to let the node start
 			while PedIsPlaying(gPlayer,"/G/PLAYER/DEFAULT_KEY/LOCOMOTION",true) and PedMePlaying(gPlayer,"EXHAUSTED_COLLAPSE",true) do
 				Wait(0)

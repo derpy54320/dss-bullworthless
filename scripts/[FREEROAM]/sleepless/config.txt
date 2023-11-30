@@ -1,2 +1,4 @@
 require_version 5
 client_script sleepless.lua
+
+auto_start false # disabled for now so we can use / test the passout instead
