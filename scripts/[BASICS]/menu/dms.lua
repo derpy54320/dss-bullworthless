@@ -105,8 +105,8 @@ function mt_menu.__index:draw(keep)
 			end
 		else
 			self[1] = "(empty menu)"
-			self.roptions[i] = nil
-			self.doptions[i] = nil
+			self.roptions[1] = nil
+			self.doptions[1] = nil
 		end
 		self.update = true
 		return F_DrawMenu(self)
