@@ -1,0 +1,10 @@
+# derpy's script server - basync ai - derpy54320
+
+[CONFIG]
+require_version 9
+require_dependency basync
+main_script sv_ai.lua
+client_script cl_ai.lua
+client_file module.lua
+client_file ai.lua
+client_file nodes.lur

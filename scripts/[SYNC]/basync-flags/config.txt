@@ -1,0 +1,9 @@
+# derpy's script server - basync flags - derpy54320
+
+[CONFIG]
+require_version 9
+require_dependency basync
+main_script sv_flags.lua
+client_script cl_flags.lua
+client_file module.lua
+client_file flags.lua

@@ -1,0 +1,8 @@
+# derpy's script server - basync gravity - derpy54320
+
+[CONFIG]
+require_version 9
+require_dependency basync
+main_script sv_gravity.lua
+client_script cl_gravity.lua
+client_file module.lua
