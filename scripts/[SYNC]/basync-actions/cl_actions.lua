@@ -92,6 +92,15 @@ RegisterLocalEventHandler("basync:setPed",function(ped)
 	end
 end)
 
+-- temporary fix for lack of attitude sync
+RegisterLocalEventHandler("basync:setPed",function(ped)
+	for f = 0,13 do
+		if PedGetPedToTypeAttitude(ped.ped,f) ~= 2 then
+			PedSetPedToTypeAttitude(ped.ped,f,2)
+		end
+	end
+end)
+
 -- cleanup
 function MissionCleanup()
 	PedSetActionTree(gPlayer,"","")
