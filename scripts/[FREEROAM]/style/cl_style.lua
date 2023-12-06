@@ -26,7 +26,7 @@ function main()
 end
 function custom_style()
 	while true do
-		if PedMePlaying(gPlayer,"OFFENSE",true) then
+		if PedMePlaying(gPlayer,"OFFENSE",true) and not PedIsValid(PedGetGrappleTargetPed(gPlayer)) then
 			PedSetActionNode(gPlayer,"/G","")
 		elseif PedMePlaying(gPlayer,"DEFAULT_KEY",true) then
 			for node,tree in pairs(gOverrides) do
