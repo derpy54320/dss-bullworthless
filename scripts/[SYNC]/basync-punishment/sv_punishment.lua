@@ -2,7 +2,7 @@
 LoadScript("module.lua")
 
 -- register
-register_ped_field("trouble",0)
+register_ped_field("trouble",-1) -- -1 tells the client *not* to set anything (useful since you can't get npc punishment points)
 
 -- check
 RegisterLocalEventHandler("basync:setPed",function(k,v)
@@ -23,7 +23,7 @@ function _G.PedGetPunishmentPoints(ped)
 end
 function mt_ped.__index:set_punishment_points(points)
 	net.basync.validate_ped(self,2)
-	if type(points) ~= "number" or points < 0 then
+	if type(points) ~= "number" or (points < 0 and points ~= -1) then
 		error("invalid points",2)
 	end
 	self.server.trouble = points

@@ -8,7 +8,7 @@ RegisterLocalEventHandler("basync:getPed",function(ped,update)
 	end
 end)
 RegisterLocalEventHandler("basync:setPed",function(ped)
-	if not ped.state:is_owner() or ped.state:was_updated("trouble") then
+	if ped.server.trouble ~= -1 and (not ped.state:is_owner() or ped.state:was_updated("trouble")) then
 		PedSetPunishmentPoints(ped.ped,ped.server.trouble)
 	end
 end)
