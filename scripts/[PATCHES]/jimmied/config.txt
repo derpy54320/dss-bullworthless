@@ -1,0 +1,5 @@
+# getting "jimmied" is when your model is rebuilt as jimmy even though you are not using the "player" model
+# this script prevents that from happening
+
+require_version 9
+client_script cl_jimmied.lua
