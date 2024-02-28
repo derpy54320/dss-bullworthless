@@ -134,7 +134,7 @@ end
 
 CreateThread(function()
 	local alpha = 0
-	while false do
+	while true do
 		local hidden = true
 		for ped in AllPeds() do
 			if PedIsInCombat(ped) and PedGetTargetPed(ped) == gPlayer then
@@ -142,7 +142,7 @@ CreateThread(function()
 				break
 			end
 		end
-		if hidden then
+		if hidden and PedGetFlag(gPlayer,2) then
 			alpha = alpha + GetFrameTime() / 1
 			if alpha > 1 then
 				alpha = 1
