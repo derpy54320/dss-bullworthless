@@ -67,6 +67,11 @@ function main()
 			elseif ped:is_valid() then
 				local v = ped:get_ped()
 				if PedIsValid(v) then
+					for f = 0,13 do
+						if f ~= PedGetFaction(v) and PedGetPedToTypeAttitude(v,f) ~= 0 then
+							PedSetPedToTypeAttitude(v,f,0)
+						end
+					end
 					if ped:is_owner() then
 						if not wandering[v] then
 							PedWander(v)
